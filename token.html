@@ -1,0 +1,1700 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SmartLiquid - 币种详情 SOPH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #090a0b;
+  --panel: #111315;
+  --panel-card: #14171a;
+  --panel-hover: #181c21;
+  --panel-subtle: #0d0f11;
+  --border-subtle: #202429;
+  --border-strong: #2a3037;
+  --border-active: #3a424c;
+  --text-main: #f3f5f7;
+  --text-secondary: #c5cbd2;
+  --text-dim: #8b949e;
+  --text-muted: #57606a;
+  --green: #2ecc71;
+  --green-accent: #3dd68c;
+  --green-badge: rgba(46, 204, 113, 0.08);
+  --green-badge-border: rgba(46, 204, 113, 0.22);
+  --red: #f85149;
+  --red-accent: #ff7b72;
+  --red-badge: rgba(248, 81, 73, 0.08);
+  --red-badge-border: rgba(248, 81, 73, 0.22);
+  --orange: #e3b341;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+body { min-width: 1160px; }
+button, input { font: inherit; outline: none; border: none; }
+
+.app {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+}
+
+/* ========================================================
+   顶级导航栏 (平铺无嵌套、全站统一)
+   ======================================================== */
+.topbar {
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+}
+.brand-logo-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #161a1e;
+  border: 1px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+}
+.brand-logo-badge svg { width: 15px; height: 15px; fill: var(--text-secondary); }
+.brand:hover .brand-logo-badge svg { fill: var(--green-accent); }
+.brand-word { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
+.brand-word b { color: var(--green-accent); }
+
+.platform-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.platform-link {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 8px 0;
+  position: relative;
+  transition: color 0.15s ease;
+}
+.platform-link:hover { color: #fff; }
+.platform-link.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+.platform-link.active::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  background: var(--green);
+  left: 0;
+  right: 0;
+  bottom: -14px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nav-btn-copy {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+.nav-btn-copy:hover {
+  background: #1b2025;
+  border-color: var(--border-strong);
+  color: #fff;
+}
+.nav-copy-badge {
+  padding: 0 5px;
+  height: 16px;
+  line-height: 15px;
+  border-radius: 8px;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  color: var(--green-accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.notice-wrap { position: relative; }
+.nav-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+}
+.nav-icon-btn:hover { background: #1c2126; color: #fff; border-color: var(--border-strong); }
+.nav-icon-btn svg { width: 14px; height: 14px; }
+.unread-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 5px;
+  height: 5px;
+  background: var(--green-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--green-accent);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 40px;
+  right: -10px;
+  width: 310px;
+  background: #13161a;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dropdown-menu.open { display: flex; }
+.dropdown-header {
+  padding: 10px 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #16191e;
+}
+.dropdown-clear { font-size: 10.5px; color: var(--text-muted); cursor: pointer; }
+.notice-item {
+  padding: 10px 14px;
+  border-bottom: 1px solid #191e23;
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+}
+.notice-item:hover { background: rgba(255, 255, 255, 0.02); }
+.notice-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--green-accent);
+  font-size: 10px;
+}
+.notice-title { font-size: 11.5px; color: #fff; font-weight: 500; }
+.notice-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.notice-time { font-size: 9px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 3px; }
+
+.wallet-wrap { position: relative; }
+.nav-wallet-btn {
+  height: 32px;
+  padding: 0 10px 0 5px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.nav-wallet-btn:hover { background: #1c2126; border-color: var(--border-strong); }
+.avatar-jazz {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%);
+  display: grid;
+  place-items: center;
+}
+.wallet-addr { font-family: var(--font-mono); font-size: 12px; color: var(--text-main); font-weight: 600; }
+.wallet-balance {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green-accent);
+  background: rgba(46, 204, 113, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.wallet-down-arrow { width: 11px; height: 11px; color: var(--text-muted); }
+
+.wallet-dropdown {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  width: 280px;
+  background: #121519;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  padding: 8px;
+}
+.wallet-dropdown.open { display: flex; }
+.wallet-dd-header {
+  padding: 10px 12px;
+  background: #171b20;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+.wallet-dd-item {
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.wallet-dd-item:hover { background: #1a2026; color: #fff; }
+.wallet-dd-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.lang-switch-pills {
+  display: inline-flex;
+  background: #0d0f11;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 2px;
+  gap: 2px;
+}
+.lang-pill {
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.lang-pill:hover { color: #fff; }
+.lang-pill.active {
+  background: #1f252c;
+  color: #fff;
+  font-weight: 700;
+}
+.invite-reward-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  color: var(--green-accent);
+  font-family: var(--font-mono);
+}
+.wallet-dd-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 6px;
+}
+
+/* 面包屑返回行 */
+.breadcrumb-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.breadcrumb-link {
+  color: var(--text-dim);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s;
+}
+.breadcrumb-link:hover { color: #fff; }
+
+/* ========================================================
+   1. 顶部｜币种市场概览卡片 (单行扁平化 · 精密双层外壳与微光质感)
+   ======================================================== */
+.market-overview-card {
+  background: linear-gradient(180deg, #13161a 0%, #0e1013 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 14px 22px;
+  display: grid;
+  grid-template-columns: 290px 140px 160px 230px 1fr;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+.market-overview-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.12) 30%, rgba(46, 204, 113, 0.25) 50%, rgba(255, 255, 255, 0.12) 70%, transparent 100%);
+  pointer-events: none;
+}
+
+.coin-hero-compact {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.coin-icon-lg {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #152219 0%, #0f1519 100%);
+  border: 1px solid rgba(46, 204, 113, 0.35);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green-accent);
+  box-shadow: 0 2px 10px rgba(46, 204, 113, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  letter-spacing: -0.5px;
+}
+.coin-info-pack {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.coin-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.coin-symbol {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.4px;
+}
+.perp-badge {
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  background: #141c24;
+  color: #79a8f5;
+  border: 1px solid rgba(121, 168, 245, 0.25);
+  font-family: var(--font-mono);
+  letter-spacing: 0.5px;
+}
+.coin-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.coin-price-big {
+  font-family: var(--font-mono);
+  font-size: 19px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.6px;
+  font-feature-settings: "tnum" 1;
+}
+.coin-chg-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green-accent);
+  background: rgba(46, 204, 113, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+.overview-col-clean {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-left: 1px solid var(--border-subtle);
+  padding-left: 18px;
+}
+.clean-label {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+.clean-val {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.4px;
+  font-feature-settings: "tnum" 1;
+}
+.clean-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  letter-spacing: -0.1px;
+}
+
+.clean-ratio-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.clean-ratio-strip {
+  height: 5px;
+  border-radius: 3px;
+  display: flex;
+  overflow: hidden;
+  background: #181c21;
+  position: relative;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+.clean-ratio-strip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 2;
+}
+.ratio-long-bar {
+  background: linear-gradient(90deg, #1fa558 0%, #2ecc71 100%);
+  height: 100%;
+}
+.ratio-short-bar {
+  background: linear-gradient(90deg, #f85149 0%, #d83a32 100%);
+  height: 100%;
+}
+
+/* ========================================================
+   中层网格：左侧分类多空分布 + 右侧清算地图 (严格等高)
+   ======================================================== */
+.mid-grid {
+  display: grid;
+  grid-template-columns: 440px minmax(0, 1fr);
+  gap: 18px;
+  margin-bottom: 22px;
+  align-items: stretch;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  position: relative;
+}
+
+.card-header {
+  height: 44px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, #121519 0%, #0e1013 100%);
+}
+.card-header-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #f0f3f6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.1px;
+}
+.card-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.header-pill-btn {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background: #15181d;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  font-size: 10.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.header-pill-btn:hover {
+  background: #1b2026;
+  color: #fff;
+  border-color: var(--border-strong);
+}
+.header-pill-btn.active {
+  background: #1f262f;
+  color: #fff;
+  border-color: var(--border-active);
+  font-weight: 600;
+}
+
+/* 2. 左侧｜钱包分类多空分布 - 极简紧凑排布 */
+.breakdown-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  gap: 7px;
+  background: #0d0f12;
+}
+
+.cat-row-slim {
+  display: grid;
+  grid-template-columns: 82px 1fr 68px;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  background: #121519;
+  border: 1px solid var(--border-subtle);
+  border-radius: 7px;
+  transition: all 0.15s ease;
+}
+.cat-row-slim:hover {
+  background: #161a20;
+  border-color: var(--border-strong);
+}
+.cat-row-slim.highlight {
+  background: linear-gradient(90deg, rgba(46, 204, 113, 0.06) 0%, #121614 100%);
+  border-color: rgba(46, 204, 113, 0.35);
+  box-shadow: inset 0 1px 0 rgba(46, 204, 113, 0.15);
+}
+
+.cat-name-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cat-name-main {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.2px;
+}
+.cat-name-sub {
+  font-size: 9.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+}
+
+.cat-bar-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cat-bar-text {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-feature-settings: "tnum" 1;
+}
+.cat-track-bar {
+  position: relative;
+  height: 6px;
+  background: #090b0d;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid #1c2127;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.cat-track-zero {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: #47515e;
+  z-index: 2;
+}
+.cat-bar-left {
+  position: absolute;
+  right: 50%;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(270deg, #f85149 0%, rgba(248, 81, 73, 0.6) 100%);
+  border-radius: 2px 0 0 2px;
+}
+.cat-bar-right {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #2ecc71 0%, rgba(46, 204, 113, 0.6) 100%);
+  border-radius: 0 2px 2px 0;
+}
+
+.cat-badge-box {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.bias-badge {
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+.bias-long {
+  background: var(--green-badge);
+  color: var(--green-accent);
+  border: 1px solid var(--green-badge-border);
+}
+.bias-short {
+  background: var(--red-badge);
+  color: #ff7b72;
+  border: 1px solid var(--red-badge-border);
+}
+.bias-diff-pill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  font-feature-settings: "tnum" 1;
+}
+
+.clean-summary-footer {
+  padding: 8px 12px;
+  background: #111418;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 10.5px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.clean-summary-footer b { color: #fff; }
+
+/* ========================================================
+   3. 右侧｜Hyperliquid 清算地图 - 极简聚焦
+   ======================================================== */
+.liquidation-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  gap: 7px;
+  background: #0d0f12;
+}
+
+.liq-chart-container {
+  position: relative;
+  height: 220px;
+  width: 100%;
+  background: #090b0d;
+  border: 1px solid var(--border-subtle);
+  border-radius: 7px;
+  overflow: hidden;
+  padding: 8px 12px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.liq-chart-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.liq-bottom-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #111418;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 10.5px;
+}
+.liq-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.liq-stat-item b {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #fff;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ========================================================
+   4. 底部｜相关钱包列表 (机构级精致数据表)
+   ======================================================== */
+.table-card {
+  margin-top: 6px;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.table-header-bar {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, #121519 0%, #0e1013 100%);
+}
+.table-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.table-main-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.2px;
+}
+.table-title-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.table-filter-tabs {
+  display: inline-flex;
+  background: #090b0d;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+.table-tab-btn {
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.table-tab-btn:hover { color: #fff; }
+.table-tab-btn.active {
+  background: #1b2026;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.thead {
+  color: var(--text-muted);
+  background: #090b0d;
+}
+th {
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+  color: var(--text-muted);
+}
+th.num, td.num { text-align: right; }
+td {
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(32, 36, 41, 0.6);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-feature-settings: "tnum" 1;
+}
+tbody tr {
+  transition: background 0.12s ease;
+}
+tbody tr:hover { background: rgba(255, 255, 255, 0.025); }
+
+.wallet-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-sans);
+}
+.wallet-avatar-sm {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #13171b;
+  border: 1px solid var(--border-strong);
+  color: var(--green-accent);
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+.wallet-addr-txt {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: -0.2px;
+}
+.cat-tag-sm {
+  font-size: 9.5px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.badge-dir {
+  display: inline-block;
+  padding: 1.5px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+.badge-long { background: var(--green-badge); color: var(--green-accent); border: 1px solid var(--green-badge-border); }
+.badge-short { background: var(--red-badge); color: #ff7b72; border: 1px solid var(--red-badge-border); }
+
+.pos { color: var(--green-accent); }
+.neg { color: var(--red); }
+
+.btn-action-view {
+  padding: 4px 10px;
+  border-radius: 5px;
+  background: #13171b;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-sans);
+}
+.btn-action-view:hover {
+  background: #1a2027;
+  border-color: var(--border-active);
+  color: #fff;
+}
+
+/* Toast */
+.toast-msg {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: #14181c;
+  border: 1px solid var(--border-strong);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast-msg.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 顶级导航栏：全站统一样式，无嵌套box -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a class="brand" href="square.html">
+        <div class="brand-logo-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.2L18.8 8 12 11.8 5.2 8 12 4.2zM5 9.8l6 3.3v7.1l-6-3.3V9.8zm8 10.4v-7.1l6-3.3v7.1l-6 3.3z"/></svg>
+        </div>
+        <span class="brand-word">SMART<b>LIQUID</b></span>
+      </a>
+      <nav class="platform-nav">
+        <a href="square.html" class="platform-link" title="跟单广场">跟单广场</a>
+        <a href="javascript:void(0)" class="platform-link" onclick="showToast('这期不做')">市场行情</a>
+        <a href="javascript:void(0)" class="platform-link" onclick="showToast('这期不做')">合约交易</a>
+      </nav>
+    </div>
+
+    <div class="topbar-right">
+      <a href="copytrade.html" class="nav-btn-copy" title="查看我的跟单">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <span>我的跟单</span>
+        <span class="nav-copy-badge">2</span>
+      </a>
+
+      <div class="notice-wrap">
+        <button class="nav-icon-btn" id="notice-btn" title="消息与成交通知">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span class="unread-dot" id="notice-dot"></span>
+        </button>
+        <div class="dropdown-menu" id="notice-dropdown">
+          <div class="dropdown-header">
+            <span>个人交易通知</span>
+            <span class="dropdown-clear" onclick="document.getElementById('notice-dot').style.display='none';showToast('已清空未读通知')">全部已读</span>
+          </div>
+          <div class="notice-item">
+            <div class="notice-icon">✓</div>
+            <div>
+              <div class="notice-title">跟单开仓成功</div>
+              <div class="notice-desc">跟随 0x456f 同步建立 HYPE 多头仓位，开仓价 $37.46</div>
+              <div class="notice-time">10分钟前</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wallet-wrap">
+        <div class="nav-wallet-btn" id="wallet-btn">
+          <div class="avatar-jazz">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+          </div>
+          <span class="wallet-addr">0x89C...3D4e</span>
+          <span class="wallet-balance">12,450 USDC</span>
+          <svg class="wallet-down-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="wallet-dropdown" id="wallet-dropdown">
+          <!-- 顶部资产与网络 -->
+          <div class="wallet-dd-header">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:10px;color:var(--text-muted)">当前网络: Arbitrum One</span>
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:14px;color:#fff;font-weight:700;margin-top:3px">12,450.00 USDC</div>
+          </div>
+
+          <!-- 语言切换 (明显独立行) -->
+          <div class="wallet-dd-item" style="cursor:default">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>系统语言</span>
+            </div>
+            <div class="lang-switch-pills">
+              <span class="lang-pill active" onclick="switchLang('zh')">中文</span>
+              <span class="lang-pill" onclick="switchLang('en')">EN</span>
+            </div>
+          </div>
+
+          <!-- 我的邀请 (跳转独立邀请页面) -->
+          <a class="wallet-dd-item" id="wallet-dd-invite" href="invite.html">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7.5" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+              <span>我的邀请中心</span>
+            </div>
+            <span class="invite-reward-badge">返佣 20%</span>
+          </a>
+
+          <!-- 前往我的跟单 -->
+          <a class="wallet-dd-item" href="copytrade.html">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>我的跟单投资组合</span>
+            </div>
+            <span style="font-size:11px;color:var(--text-muted)">→</span>
+          </a>
+
+          <div class="wallet-dd-divider"></div>
+
+          <!-- 复制地址 -->
+          <div class="wallet-dd-item" onclick="showToast('已复制钱包地址')">
+            <div class="wallet-dd-left">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>复制完整钱包地址</span>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted)">0x89C...3D4e</span>
+          </div>
+
+          <!-- 断开连接 -->
+          <div class="wallet-dd-item" style="color:#ff757e" onclick="showToast('已断开连接')">
+            <div class="wallet-dd-left">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>断开钱包连接</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 面包屑返回 -->
+  <div class="breadcrumb-row">
+    <a href="square.html" class="breadcrumb-link">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      跟单广场
+    </a>
+    <span>/</span>
+    <span style="color:#fff;font-weight:600">SOPH 币种深度分析</span>
+  </div>
+
+  <!-- 1. 顶部｜币种市场概览 (单行极简控制台 · 突出核心数据) -->
+  <section class="market-overview-card">
+    <!-- 标的与实时价格 -->
+    <div class="coin-hero-compact">
+      <div class="coin-icon-lg">SO</div>
+      <div class="coin-info-pack">
+        <div class="coin-name-row">
+          <span class="coin-symbol">SOPH</span>
+          <span class="perp-badge">PERP</span>
+        </div>
+        <div class="coin-price-row">
+          <span class="coin-price-big">$1.0000</span>
+          <span class="coin-chg-pill">+4.12%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 关联钱包 -->
+    <div class="overview-col-clean">
+      <span class="clean-label">监控钱包</span>
+      <div class="clean-val">8 <span style="font-size:11px;color:var(--text-muted);font-weight:normal">个</span></div>
+      <span class="clean-sub" style="color:var(--green-accent)">3 聪明资金 · 2 巨鲸</span>
+    </div>
+
+    <!-- 名义持仓 -->
+    <div class="overview-col-clean">
+      <span class="clean-label">关联名义价值</span>
+      <div class="clean-val">$551.4K</div>
+      <span class="clean-sub">占全网 14.2%</span>
+    </div>
+
+    <!-- 多空比例 -->
+    <div class="overview-col-clean">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span class="clean-label">多 / 空价值</span>
+        <span class="clean-sub" style="color:#fff;font-weight:600">51% / 49%</span>
+      </div>
+      <div class="clean-ratio-box">
+        <div class="clean-ratio-strip">
+          <div class="ratio-long-bar" style="width:51%"></div>
+          <div class="ratio-short-bar" style="width:49%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px">
+          <span class="pos">$279K 多</span>
+          <span class="neg">$272K 空</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 未实现盈亏 -->
+    <div class="overview-col-clean">
+      <span class="clean-label">未实现 PNL</span>
+      <div class="clean-val neg">-$35.8K <span style="font-size:11px;font-weight:normal">(-6.5%)</span></div>
+      <span class="clean-sub">均价 $1.065</span>
+    </div>
+  </section>
+
+  <!-- 中层网格：左侧分类多空分布 + 右侧 Hyperliquid 清算地图 -->
+  <div class="mid-grid">
+
+    <!-- 2. 左侧｜钱包分类多空分布 (极简紧凑) -->
+    <section class="card">
+      <div class="card-header">
+        <div class="card-header-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+          钱包分类多空分布
+        </div>
+        <span style="font-size:10.5px;color:var(--text-muted);font-family:var(--font-mono)">截面分布</span>
+      </div>
+
+      <div class="breakdown-body">
+        <!-- 类别 1: 长线持有 -->
+        <div class="cat-row-slim">
+          <div class="cat-name-box">
+            <span class="cat-name-main">长线持有</span>
+            <span class="cat-name-sub">2 钱包 · $110K</span>
+          </div>
+          <div class="cat-bar-box">
+            <div class="cat-bar-text">
+              <span class="neg">空 78% · $86K</span>
+              <span class="pos">多 22%</span>
+            </div>
+            <div class="cat-track-bar">
+              <div class="cat-track-zero"></div>
+              <div class="cat-bar-left" style="width:28%"></div>
+            </div>
+          </div>
+          <div class="cat-badge-box">
+            <span class="bias-badge bias-short">偏空</span>
+            <span class="bias-diff-pill neg">-56pp</span>
+          </div>
+        </div>
+
+        <!-- 类别 2: 波段主力 -->
+        <div class="cat-row-slim highlight">
+          <div class="cat-name-box">
+            <span class="cat-name-main" style="color:var(--green-accent)">波段主力</span>
+            <span class="cat-name-sub">4 钱包 · $441K</span>
+          </div>
+          <div class="cat-bar-box">
+            <div class="cat-bar-text">
+              <span class="neg">空 39%</span>
+              <span class="pos" style="font-weight:700">多 61% · $269K</span>
+            </div>
+            <div class="cat-track-bar">
+              <div class="cat-track-zero"></div>
+              <div class="cat-bar-right" style="width:11%"></div>
+            </div>
+          </div>
+          <div class="cat-badge-box">
+            <span class="bias-badge bias-long">偏多</span>
+            <span class="bias-diff-pill pos">+22pp</span>
+          </div>
+        </div>
+
+        <!-- 类别 3: 日内高频 -->
+        <div class="cat-row-slim">
+          <div class="cat-name-box">
+            <span class="cat-name-main">日内高频</span>
+            <span class="cat-name-sub">1 钱包 · $60K</span>
+          </div>
+          <div class="cat-bar-box">
+            <div class="cat-bar-text">
+              <span class="neg">空 75% · $45K</span>
+              <span class="pos">多 25%</span>
+            </div>
+            <div class="cat-track-bar">
+              <div class="cat-track-zero"></div>
+              <div class="cat-bar-left" style="width:25%"></div>
+            </div>
+          </div>
+          <div class="cat-badge-box">
+            <span class="bias-badge bias-short">偏空</span>
+            <span class="bias-diff-pill neg">-50pp</span>
+          </div>
+        </div>
+
+        <!-- 类别 4: 算法做市 -->
+        <div class="cat-row-slim">
+          <div class="cat-name-box">
+            <span class="cat-name-main">算法量化</span>
+            <span class="cat-name-sub">1 钱包 · $50K</span>
+          </div>
+          <div class="cat-bar-box">
+            <div class="cat-bar-text">
+              <span class="neg">空 66% · $33K</span>
+              <span class="pos">多 34%</span>
+            </div>
+            <div class="cat-track-bar">
+              <div class="cat-track-zero"></div>
+              <div class="cat-bar-left" style="width:16%"></div>
+            </div>
+          </div>
+          <div class="cat-badge-box">
+            <span class="bias-badge bias-short">偏空</span>
+            <span class="bias-diff-pill neg">-32pp</span>
+          </div>
+        </div>
+
+        <!-- 底部精简共识 -->
+        <div class="clean-summary-footer">
+          <span>分类共识：<b>长线/日内偏空 · 波段主力重仓偏多</b></span>
+          <span style="font-family:var(--font-mono);font-size:9.5px;color:var(--text-muted)">1m 前更新</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 右侧｜Hyperliquid 清算地图 (清爽聚焦) -->
+    <section class="card">
+      <div class="card-header">
+        <div class="card-header-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          Hyperliquid 清算地图
+        </div>
+        <div class="card-header-controls">
+          <span style="font-size:11px;color:var(--text-dim);font-family:var(--font-mono);margin-right:4px">清算池: <b style="color:#fff">$1.24M</b></span>
+          <button class="header-pill-btn active" onclick="showToast('全杠杆清算池')">全杠杆</button>
+          <button class="header-pill-btn" onclick="showToast('高杠杆 ≥25x')">≥25x</button>
+        </div>
+      </div>
+
+      <div class="liquidation-body">
+        <!-- SVG 图表 -->
+        <div class="liq-chart-container">
+          <svg class="liq-chart-svg" viewBox="0 0 680 220" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="long-bar-grad" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="#153621" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#2ecc71" stop-opacity="0.95"/>
+              </linearGradient>
+              <linearGradient id="short-bar-grad" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="#381518" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#f85149" stop-opacity="0.95"/>
+              </linearGradient>
+              <linearGradient id="cum-long-area" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#2ecc71" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#2ecc71" stop-opacity="0.0"/>
+              </linearGradient>
+              <linearGradient id="cum-short-area" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#f85149" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#f85149" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+
+            <!-- 网格线 -->
+            <line x1="30" y1="30" x2="650" y2="30" stroke="#15191d" stroke-width="0.8" stroke-dasharray="3 3"/>
+            <line x1="30" y1="80" x2="650" y2="80" stroke="#15191d" stroke-width="0.8" stroke-dasharray="3 3"/>
+            <line x1="30" y1="130" x2="650" y2="130" stroke="#15191d" stroke-width="0.8" stroke-dasharray="3 3"/>
+            <line x1="30" y1="180" x2="650" y2="180" stroke="#222830" stroke-width="1"/>
+
+            <!-- 左侧：多头清算柱 (价格下跌触发) -->
+            <path d="M 45 60 C 90 65, 150 90, 210 130 C 260 160, 290 175, 330 180 L 330 180 L 45 180 Z" fill="url(#cum-long-area)"/>
+            <path d="M 45 60 C 90 65, 150 90, 210 130 C 260 160, 290 175, 330 180" fill="none" stroke="#2ecc71" stroke-width="1.8"/>
+
+            <rect x="50" y="145" width="14" height="35" fill="url(#long-bar-grad)" rx="2"/>
+            <rect x="75" y="125" width="14" height="55" fill="url(#long-bar-grad)" rx="2"/>
+            <rect x="100" y="100" width="14" height="80" fill="url(#long-bar-grad)" rx="2"/>
+            <rect x="125" y="70" width="14" height="110" fill="url(#long-bar-grad)" rx="2"/>
+            <rect x="150" y="90" width="14" height="90" fill="url(#long-bar-grad)" rx="2"/>
+            <rect x="175" y="115" width="14" height="65" fill="url(#long-bar-grad)" rx="2"/>
+            <rect x="200" y="130" width="14" height="50" fill="url(#long-bar-grad)" rx="2"/>
+            <rect x="225" y="55" width="16" height="125" fill="url(#long-bar-grad)" rx="2"/>
+            <rect x="250" y="140" width="14" height="40" fill="url(#long-bar-grad)" rx="2"/>
+            <rect x="275" y="160" width="14" height="20" fill="url(#long-bar-grad)" rx="2"/>
+            <rect x="300" y="170" width="14" height="10" fill="url(#long-bar-grad)" rx="2"/>
+
+            <!-- 中轴：当前价格 $1.0000 -->
+            <line x1="340" y1="12" x2="340" y2="185" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <rect x="305" y="2" width="70" height="18" rx="3" fill="#1c2430" stroke="#60a5fa" stroke-width="1"/>
+            <text x="340" y="14" fill="#ffffff" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">现价 $1.00</text>
+
+            <!-- 右侧：空头清算柱 (价格上涨触发) -->
+            <path d="M 350 180 C 390 175, 420 160, 470 130 C 530 90, 590 65, 635 60 L 635 180 L 350 180 Z" fill="url(#cum-short-area)"/>
+            <path d="M 350 180 C 390 175, 420 160, 470 130 C 530 90, 590 65, 635 60" fill="none" stroke="#f85149" stroke-width="1.8"/>
+
+            <rect x="365" y="170" width="14" height="10" fill="url(#short-bar-grad)" rx="2"/>
+            <rect x="390" y="155" width="14" height="25" fill="url(#short-bar-grad)" rx="2"/>
+            <rect x="415" y="130" width="14" height="50" fill="url(#short-bar-grad)" rx="2"/>
+            <rect x="440" y="105" width="14" height="75" fill="url(#short-bar-grad)" rx="2"/>
+            <rect x="465" y="35" width="16" height="145" fill="url(#short-bar-grad)" rx="2"/>
+            <rect x="495" y="80" width="14" height="100" fill="url(#short-bar-grad)" rx="2"/>
+            <rect x="520" y="100" width="14" height="80" fill="url(#short-bar-grad)" rx="2"/>
+            <rect x="545" y="120" width="14" height="60" fill="url(#short-bar-grad)" rx="2"/>
+            <rect x="570" y="140" width="14" height="40" fill="url(#short-bar-grad)" rx="2"/>
+            <rect x="595" y="155" width="14" height="25" fill="url(#short-bar-grad)" rx="2"/>
+            <rect x="620" y="165" width="14" height="15" fill="url(#short-bar-grad)" rx="2"/>
+
+            <!-- 价格刻度 -->
+            <text x="55" y="198" fill="#57606a" font-size="9.5" font-family="'JetBrains Mono', monospace">0.82</text>
+            <text x="130" y="198" fill="#57606a" font-size="9.5" font-family="'JetBrains Mono', monospace">0.88</text>
+            <text x="225" y="198" fill="#2ecc71" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700">0.92 (多头平仓)</text>
+            <text x="340" y="200" fill="#fff" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">1.00</text>
+            <text x="470" y="198" fill="#f85149" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700">1.08 (轧空池)</text>
+            <text x="550" y="198" fill="#57606a" font-size="9.5" font-family="'JetBrains Mono', monospace">1.12</text>
+            <text x="625" y="198" fill="#57606a" font-size="9.5" font-family="'JetBrains Mono', monospace">1.18</text>
+          </svg>
+        </div>
+
+        <!-- 底部单行精炼关键位 -->
+        <div class="liq-bottom-strip">
+          <div class="liq-stat-item">
+            <span style="color:var(--text-muted)">上方轧空:</span>
+            <b class="neg">$1.080 (+8.0%)</b>
+          </div>
+          <div class="liq-stat-item">
+            <span style="color:var(--text-muted)">下方支撑:</span>
+            <b class="pos">$0.920 (-8.0%)</b>
+          </div>
+          <div class="liq-stat-item">
+            <span style="color:var(--text-muted)">安全垫:</span>
+            <b style="color:var(--green-accent)">6.5% 充足</b>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 4. 底部｜相关钱包列表 -->
+  <section class="card table-card">
+    <div class="table-header-bar">
+      <div class="table-title-group">
+        <div class="table-main-title">
+          相关钱包 (8)
+          <span style="font-size:11px;padding:2px 7px;border-radius:4px;background:#18221a;color:var(--green-accent);border:1px solid rgba(46,204,113,0.3)">持仓与盈利关联</span>
+        </div>
+        <div class="table-title-sub">
+          钱包行情过分类，点击钱包返回详情查看历史表现并执行跟单
+        </div>
+      </div>
+
+      <div class="table-filter-tabs">
+        <button class="table-tab-btn active" data-dir="all">全部 (8)</button>
+        <button class="table-tab-btn" data-dir="long">做多 (4)</button>
+        <button class="table-tab-btn" data-dir="short">做空 (4)</button>
+      </div>
+    </div>
+
+    <table>
+      <thead class="thead">
+        <tr>
+          <th>钱包 / 分类</th>
+          <th>方向</th>
+          <th>杠杆</th>
+          <th class="num">名义价值</th>
+          <th class="num">平均入场</th>
+          <th class="num">未实现 PNL</th>
+          <th class="num">清算距离</th>
+          <th class="num">持仓时长</th>
+          <th class="num">操作</th>
+        </tr>
+      </thead>
+      <tbody id="wallet-table-body">
+        <!-- 重点标杆 1 (来自需求说明) -->
+        <tr data-dir="long">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm">04</div>
+              <div>
+                <div class="wallet-addr-txt">0x04b0...dd92</div>
+                <div class="cat-tag-sm">波段钱包</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-dir badge-long">做多</span></td>
+          <td style="color:#fff;font-weight:600">2.0x</td>
+          <td class="num pos" style="font-weight:700">+$140K</td>
+          <td class="num">$0.01</td>
+          <td class="num neg" style="font-weight:700">-$24,001</td>
+          <td class="num" style="color:var(--green-accent);font-weight:600">31.8%</td>
+          <td class="num" style="color:var(--text-dim)">5h</td>
+          <td class="num">
+            <a href="code.html" class="btn-action-view">
+              查看钱包
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+            </a>
+          </td>
+        </tr>
+
+        <!-- 标杆 2 (聪明资金) -->
+        <tr data-dir="long">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:#60a5fa">45</div>
+              <div>
+                <div class="wallet-addr-txt">0x456f...01ac</div>
+                <div class="cat-tag-sm">波段钱包 · 聪明资金</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-dir badge-long">做多</span></td>
+          <td style="color:#fff;font-weight:600">3.5x</td>
+          <td class="num pos" style="font-weight:700">+$82K</td>
+          <td class="num">$0.96</td>
+          <td class="num pos" style="font-weight:700">+$3,280</td>
+          <td class="num" style="color:var(--green-accent);font-weight:600">26.4%</td>
+          <td class="num" style="color:var(--text-dim)">2d 14h</td>
+          <td class="num">
+            <a href="code.html" class="btn-action-view">
+              查看钱包
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+            </a>
+          </td>
+        </tr>
+
+        <!-- 标杆 3 (长线空头) -->
+        <tr data-dir="short">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:#ff7b72">71</div>
+              <div>
+                <div class="wallet-addr-txt">0x7163...163b</div>
+                <div class="cat-tag-sm">长线钱包</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-dir badge-short">做空</span></td>
+          <td style="color:#fff;font-weight:600">1.8x</td>
+          <td class="num neg" style="font-weight:700">-$62K</td>
+          <td class="num">$1.04</td>
+          <td class="num pos" style="font-weight:700">+$2,480</td>
+          <td class="num" style="color:var(--green-accent);font-weight:600">48.2%</td>
+          <td class="num" style="color:var(--text-dim)">18d 06h</td>
+          <td class="num">
+            <a href="code.html" class="btn-action-view">
+              查看钱包
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+            </a>
+          </td>
+        </tr>
+
+        <!-- 标杆 4 (日内空头) -->
+        <tr data-dir="short">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:#e5be79">9a</div>
+              <div>
+                <div class="wallet-addr-txt">0x9a12...7e41</div>
+                <div class="cat-tag-sm">日内高频</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-dir badge-short">做空</span></td>
+          <td style="color:#fff;font-weight:600">5.0x</td>
+          <td class="num neg" style="font-weight:700">-$45K</td>
+          <td class="num">$1.01</td>
+          <td class="num pos" style="font-weight:700">+$450</td>
+          <td class="num" style="color:var(--orange);font-weight:600">18.5%</td>
+          <td class="num" style="color:var(--text-dim)">3h 12m</td>
+          <td class="num">
+            <a href="code.html" class="btn-action-view">
+              查看钱包
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+            </a>
+          </td>
+        </tr>
+
+        <!-- 标杆 5 (算法对冲) -->
+        <tr data-dir="short">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:#a78bfa">67</div>
+              <div>
+                <div class="wallet-addr-txt">0x67ab...88df</div>
+                <div class="cat-tag-sm">算法策略</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-dir badge-short">做空</span></td>
+          <td style="color:#fff;font-weight:600">2.5x</td>
+          <td class="num neg" style="font-weight:700">-$33K</td>
+          <td class="num">$0.99</td>
+          <td class="num neg" style="font-weight:700">-$330</td>
+          <td class="num" style="color:var(--green-accent);font-weight:600">38.0%</td>
+          <td class="num" style="color:var(--text-dim)">7d 02h</td>
+          <td class="num">
+            <a href="code.html" class="btn-action-view">
+              查看钱包
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+            </a>
+          </td>
+        </tr>
+
+        <!-- 标杆 6 (波段多头) -->
+        <tr data-dir="long">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm">82</div>
+              <div>
+                <div class="wallet-addr-txt">0x82b4...31fe</div>
+                <div class="cat-tag-sm">波段钱包</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-dir badge-long">做多</span></td>
+          <td style="color:#fff;font-weight:600">3.0x</td>
+          <td class="num pos" style="font-weight:700">+$27K</td>
+          <td class="num">$0.98</td>
+          <td class="num pos" style="font-weight:700">+$540</td>
+          <td class="num" style="color:var(--green-accent);font-weight:600">30.1%</td>
+          <td class="num" style="color:var(--text-dim)">1d 08h</td>
+          <td class="num">
+            <a href="code.html" class="btn-action-view">
+              查看钱包
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+            </a>
+          </td>
+        </tr>
+
+        <!-- 标杆 7 (长线空头) -->
+        <tr data-dir="short">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:#ec4899">33</div>
+              <div>
+                <div class="wallet-addr-txt">0x33aa...901e</div>
+                <div class="cat-tag-sm">长线钱包</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-dir badge-short">做空</span></td>
+          <td style="color:#fff;font-weight:600">1.5x</td>
+          <td class="num neg" style="font-weight:700">-$24K</td>
+          <td class="num">$1.03</td>
+          <td class="num pos" style="font-weight:700">+$720</td>
+          <td class="num" style="color:var(--green-accent);font-weight:600">55.0%</td>
+          <td class="num" style="color:var(--text-dim)">32d 11h</td>
+          <td class="num">
+            <a href="code.html" class="btn-action-view">
+              查看钱包
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+            </a>
+          </td>
+        </tr>
+
+        <!-- 标杆 8 (波段多头) -->
+        <tr data-dir="long">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:#38bdf8">19</div>
+              <div>
+                <div class="wallet-addr-txt">0x19f2...88cc</div>
+                <div class="cat-tag-sm">波段钱包</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-dir badge-long">做多</span></td>
+          <td style="color:#fff;font-weight:600">2.2x</td>
+          <td class="num pos" style="font-weight:700">+$20K</td>
+          <td class="num">$1.02</td>
+          <td class="num neg" style="font-weight:700">-$400</td>
+          <td class="num" style="color:var(--green-accent);font-weight:600">42.8%</td>
+          <td class="num" style="color:var(--text-dim)">18h</td>
+          <td class="num">
+            <a href="code.html" class="btn-action-view">
+              查看钱包
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<!-- 提示框 Toast -->
+<div class="toast-msg" id="toast"></div>
+
+<script>
+// 顶部下拉交互
+const noticeBtn = document.getElementById('notice-btn');
+const noticeDropdown = document.getElementById('notice-dropdown');
+const walletBtn = document.getElementById('wallet-btn');
+const walletDropdown = document.getElementById('wallet-dropdown');
+
+noticeBtn.onclick = (e) => {
+  e.stopPropagation();
+  walletDropdown.classList.remove('open');
+  noticeDropdown.classList.toggle('open');
+};
+walletBtn.onclick = (e) => {
+  e.stopPropagation();
+  noticeDropdown.classList.remove('open');
+  walletDropdown.classList.toggle('open');
+};
+document.addEventListener('click', () => {
+  noticeDropdown.classList.remove('open');
+  walletDropdown.classList.remove('open');
+});
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2600);
+}
+
+function switchLang(lang) {
+  document.querySelectorAll('.lang-pill').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  showToast(lang === 'zh' ? '已切换系统语言：简体中文' : 'Switched language to English');
+}
+
+function showInviteModal() {
+  walletDropdown.classList.remove('open');
+  showToast('邀请码【SMART-8888】已复制，享受 20% 返佣');
+}
+
+// 底部表格 筛选 tab
+const tabBtns = document.querySelectorAll('.table-tab-btn');
+const rows = document.querySelectorAll('#wallet-table-body tr');
+
+tabBtns.forEach(btn => {
+  btn.onclick = function() {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const filter = this.dataset.dir;
+
+    rows.forEach(row => {
+      if (filter === 'all' || row.dataset.dir === filter) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+    showToast(`已切换至【${this.textContent.trim()}】持仓`);
+  };
+});
+</script>
+</body>
+</html>

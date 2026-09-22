@@ -1,0 +1,1416 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SmartLiquid - 我的跟单投资组合与执行明细</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #090a0b;
+  --panel: #111315;
+  --panel-card: #14171a;
+  --panel-hover: #181c21;
+  --border-subtle: #202429;
+  --border-strong: #2a3037;
+  --border-active: #3a424c;
+  --text-main: #f3f5f7;
+  --text-secondary: #c5cbd2;
+  --text-dim: #8b949e;
+  --text-muted: #57606a;
+  --green: #2ecc71;
+  --green-accent: #3dd68c;
+  --green-badge: rgba(46, 204, 113, 0.08);
+  --green-badge-border: rgba(46, 204, 113, 0.22);
+  --red: #f85149;
+  --red-badge: rgba(248, 81, 73, 0.08);
+  --red-badge-border: rgba(248, 81, 73, 0.22);
+  --orange: #e3b341;
+  --orange-badge: rgba(227, 179, 65, 0.08);
+  --orange-badge-border: rgba(227, 179, 65, 0.25);
+  --blue: #3b82f6;
+  --blue-badge: rgba(59, 130, 246, 0.08);
+  --blue-badge-border: rgba(59, 130, 246, 0.22);
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+body { min-width: 1160px; }
+button, input { font: inherit; outline: none; border: none; }
+
+.app {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+}
+
+/* ========================================================
+   顶级导航栏 (平铺无嵌套、统一清晰)
+   ======================================================== */
+.topbar {
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+}
+.brand-logo-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #161a1e;
+  border: 1px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+}
+.brand-logo-badge svg { width: 15px; height: 15px; fill: var(--text-secondary); }
+.brand:hover .brand-logo-badge svg { fill: var(--green-accent); }
+.brand-word { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
+.brand-word b { color: var(--green-accent); }
+
+.platform-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.platform-link {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 8px 0;
+  position: relative;
+  transition: color 0.15s ease;
+}
+.platform-link:hover { color: #fff; }
+.platform-link.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+.platform-link.active::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  background: var(--green);
+  left: 0;
+  right: 0;
+  bottom: -14px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nav-btn-copy {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: #161c18;
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  color: #fff;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+.nav-copy-badge {
+  padding: 0 5px;
+  height: 16px;
+  line-height: 15px;
+  border-radius: 8px;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  color: var(--green-accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.notice-wrap { position: relative; }
+.nav-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+}
+.nav-icon-btn:hover { background: #1c2126; color: #fff; border-color: var(--border-strong); }
+.nav-icon-btn svg { width: 14px; height: 14px; }
+.unread-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 5px;
+  height: 5px;
+  background: var(--green-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--green-accent);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 40px;
+  right: -10px;
+  width: 310px;
+  background: #13161a;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dropdown-menu.open { display: flex; }
+.dropdown-header {
+  padding: 10px 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #16191e;
+}
+.dropdown-clear { font-size: 10.5px; color: var(--text-muted); cursor: pointer; }
+.notice-item {
+  padding: 10px 14px;
+  border-bottom: 1px solid #191e23;
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+}
+.notice-item:hover { background: rgba(255, 255, 255, 0.02); }
+.notice-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--green-accent);
+  font-size: 10px;
+}
+.notice-title { font-size: 11.5px; color: #fff; font-weight: 500; }
+.notice-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.notice-time { font-size: 9px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 3px; }
+
+/* 钱包菜单 */
+.wallet-wrap { position: relative; }
+.nav-wallet-btn {
+  height: 32px;
+  padding: 0 10px 0 5px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.nav-wallet-btn:hover { background: #1c2126; border-color: var(--border-strong); }
+.avatar-jazz {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%);
+  display: grid;
+  place-items: center;
+}
+.wallet-addr { font-family: var(--font-mono); font-size: 12px; color: var(--text-main); font-weight: 600; }
+.wallet-balance {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green-accent);
+  background: rgba(46, 204, 113, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.wallet-down-arrow { width: 11px; height: 11px; color: var(--text-muted); }
+
+.wallet-dropdown {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  width: 280px;
+  background: #121519;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  padding: 8px;
+}
+.wallet-dropdown.open { display: flex; }
+.wallet-dd-header {
+  padding: 10px 12px;
+  background: #171b20;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+.wallet-dd-item {
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.wallet-dd-item:hover { background: #1a2026; color: #fff; }
+.wallet-dd-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.lang-switch-pills {
+  display: inline-flex;
+  background: #0d0f11;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 2px;
+  gap: 2px;
+}
+.lang-pill {
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.lang-pill:hover { color: #fff; }
+.lang-pill.active {
+  background: #1f252c;
+  color: #fff;
+  font-weight: 700;
+}
+.invite-reward-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  color: var(--green-accent);
+  font-family: var(--font-mono);
+}
+.wallet-dd-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 6px;
+}
+
+/* 页面标题与快捷操作 */
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.page-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+}
+.page-title span {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-primary {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 6px;
+  background: #18221b;
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  color: var(--green-accent);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.btn-primary:hover {
+  background: #202d24;
+  border-color: var(--green);
+  color: #fff;
+}
+
+/* 统计卡片条 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.stat-label {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+.stat-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* 核心卡片容器 */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+}
+
+/* 一级主视图切换 Tabs: 运行中策略 | 实际跟单持仓 | 跟随成交明细 */
+.main-nav-tabs {
+  height: 48px;
+  background: #0f1114;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.main-tabs-left {
+  display: flex;
+  gap: 8px;
+}
+.main-tab-btn {
+  padding: 6px 14px;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.main-tab-btn:hover { color: #fff; }
+.main-tab-btn.active {
+  background: #1a2026;
+  color: #fff;
+  border: 1px solid var(--border-strong);
+}
+.tab-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 10px;
+  background: #111417;
+  color: var(--text-muted);
+}
+.main-tab-btn.active .tab-badge {
+  background: var(--green-badge);
+  color: var(--green-accent);
+}
+
+.table-filter-tabs {
+  display: inline-flex;
+  background: #0c0e10;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 2px;
+  gap: 2px;
+}
+.table-filter-btn {
+  padding: 4px 10px;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.table-filter-btn:hover { color: #fff; }
+.table-filter-btn.active {
+  background: #1b2025;
+  color: #fff;
+  font-weight: 600;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.thead {
+  color: var(--text-muted);
+  background: #0c0e10;
+}
+th {
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 11px;
+}
+th.num, td.num { text-align: right; }
+td {
+  padding: 13px 16px;
+  border-bottom: 1px solid #16191d;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+tbody tr:hover { background: rgba(255, 255, 255, 0.018); }
+
+.trader-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-sans);
+}
+.trader-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: #18221b;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  color: var(--green-accent);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 11px;
+}
+.trader-name {
+  font-weight: 700;
+  color: #fff;
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sub {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+}
+
+.badge-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.badge-long {
+  background: var(--green-badge);
+  color: var(--green-accent);
+  border: 1px solid var(--green-badge-border);
+}
+.badge-short {
+  background: var(--red-badge);
+  color: #ff7b72;
+  border: 1px solid var(--red-badge-border);
+}
+
+.pos { color: var(--green-accent); }
+.neg { color: var(--red); }
+
+.tiny-btn {
+  height: 25px;
+  padding: 0 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  background: #15181c;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--font-sans);
+}
+.tiny-btn:hover {
+  background: #1c2126;
+  border-color: var(--border-strong);
+  color: #fff;
+}
+.tiny-btn-danger:hover {
+  border-color: rgba(248, 81, 73, 0.4);
+  color: var(--red);
+}
+
+/* 跟单参数调整弹窗 (Modal) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-backdrop.open { opacity: 1; pointer-events: auto; }
+.modal-box {
+  width: 460px;
+  background: #111316;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  transform: scale(0.96) translateY(8px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-backdrop.open .modal-box { transform: scale(1) translateY(0); }
+.modal-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  background: #14171b;
+}
+.modal-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.modal-close:hover { background: #1f252c; color: #fff; }
+.modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.target-trader {
+  background: #16191d;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.target-info { display: flex; flex-direction: column; gap: 3px; }
+.target-label { font-size: 10.5px; color: var(--text-muted); }
+.target-addr { font-family: var(--font-mono); font-size: 12px; color: #fff; font-weight: 600; }
+.target-stat { text-align: right; }
+.target-stat-val { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--green-accent); }
+.target-stat-lab { font-size: 10px; color: var(--text-muted); }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label-row { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; }
+.form-label { color: var(--text-secondary); font-weight: 500; }
+.form-extra { color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; }
+.input-wrap { position: relative; display: flex; align-items: center; }
+.form-input {
+  width: 100%;
+  height: 38px;
+  background: #0d0f11;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0 54px 0 12px;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.form-input:focus { border-color: var(--border-active); background: #121518; }
+.input-unit {
+  position: absolute;
+  right: 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.slider-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+.range-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  background: #202429;
+  border-radius: 2px;
+  outline: none;
+}
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #111316;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+}
+.range-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+.modal-footer {
+  padding: 14px 20px;
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid var(--border-subtle);
+  background: #14171b;
+}
+.btn-cancel {
+  flex: 1;
+  height: 38px;
+  background: #191c20;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-cancel:hover { background: #1f252c; color: #fff; }
+.btn-confirm {
+  flex: 2;
+  height: 38px;
+  background: #171b1f;
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  border-radius: 6px;
+  color: var(--green-accent);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-confirm:hover { background: #1f262b; border-color: var(--green); color: #fff; }
+
+.toast-msg {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: #14181c;
+  border: 1px solid var(--border-strong);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast-msg.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 顶级导航栏：仅 跟单广场 | 市场行情 | 合约交易，右侧纯平铺无嵌套 box -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a class="brand" href="square.html">
+        <div class="brand-logo-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.2L18.8 8 12 11.8 5.2 8 12 4.2zM5 9.8l6 3.3v7.1l-6-3.3V9.8zm8 10.4v-7.1l6-3.3v7.1l-6 3.3z"/></svg>
+        </div>
+        <span class="brand-word">SMART<b>LIQUID</b></span>
+      </a>
+      <nav class="platform-nav">
+        <a href="square.html" class="platform-link" title="跟单广场">跟单广场</a>
+        <a href="javascript:void(0)" class="platform-link" onclick="showToast('这期不做')">市场行情</a>
+        <a href="javascript:void(0)" class="platform-link" onclick="showToast('这期不做')">合约交易</a>
+      </nav>
+    </div>
+
+    <!-- 右侧功能元素：平铺排列，不设外层包裹 box -->
+    <div class="topbar-right">
+      <!-- 1. 我的跟单 (当前激活，标准克隆图标) -->
+      <a href="copytrade.html" class="nav-btn-copy" title="管理我当前正在执行的跟单策略">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <span>我的跟单</span>
+        <span class="nav-copy-badge" id="nav-count">2</span>
+      </a>
+
+      <!-- 2. 通知铃铛 -->
+      <div class="notice-wrap">
+        <button class="nav-icon-btn" id="notice-btn" title="消息与成交通知">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span class="unread-dot" id="notice-dot"></span>
+        </button>
+        <div class="dropdown-menu" id="notice-dropdown">
+          <div class="dropdown-header">
+            <span>个人交易通知</span>
+            <span class="dropdown-clear" onclick="document.getElementById('notice-dot').style.display='none';showToast('已清空未读通知')">全部已读</span>
+          </div>
+          <div class="notice-item">
+            <div class="notice-icon">✓</div>
+            <div>
+              <div class="notice-title">跟随开仓成功</div>
+              <div class="notice-desc">0x456f...01ac 开仓 HYPE 多单，已按 1.0x 执行</div>
+              <div class="notice-time">15分钟前</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. 钱包头像与地址 -->
+      <div class="wallet-wrap">
+        <div class="nav-wallet-btn" id="wallet-btn">
+          <div class="avatar-jazz">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+          </div>
+          <span class="wallet-addr">0x89C...3D4e</span>
+          <span class="wallet-balance">12,450 USDC</span>
+          <svg class="wallet-down-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="wallet-dropdown" id="wallet-dropdown">
+          <div class="wallet-dd-header">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:10px;color:var(--text-muted)">当前网络: Arbitrum One</span>
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:14px;color:#fff;font-weight:700;margin-top:3px">12,450.00 USDC</div>
+          </div>
+
+          <div class="wallet-dd-item" style="cursor:default">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>系统语言</span>
+            </div>
+            <div class="lang-switch-pills">
+              <span class="lang-pill active" onclick="switchLang('zh')">中文</span>
+              <span class="lang-pill" onclick="switchLang('en')">EN</span>
+            </div>
+          </div>
+
+          <!-- 我的邀请 -->
+          <a class="wallet-dd-item" id="wallet-dd-invite" href="invite.html">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7.5" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+              <span>我的邀请中心</span>
+            </div>
+            <span class="invite-reward-badge">返佣 20%</span>
+          </a>
+
+          <a class="wallet-dd-item" href="square.html">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+              <span>前往「跟单广场」发现交易员</span>
+            </div>
+            <span style="font-size:11px;color:var(--text-muted)">→</span>
+          </a>
+
+          <div class="wallet-dd-divider"></div>
+
+          <div class="wallet-dd-item" onclick="showToast('已复制钱包地址')">
+            <div class="wallet-dd-left">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>复制完整钱包地址</span>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted)">0x89C...3D4e</span>
+          </div>
+
+          <div class="wallet-dd-item" style="color:#ff757e" onclick="showToast('已断开连接')">
+            <div class="wallet-dd-left">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>断开钱包连接</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 页面标题与快速操作 -->
+  <div class="page-head">
+    <div class="page-title">
+      我的跟单投资组合
+      <span>管理我当前正在由智能合约自动执行的跟单头寸与止损配置</span>
+    </div>
+    <div class="head-actions">
+      <a href="square.html" class="btn-primary">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        发现更多交易员
+      </a>
+    </div>
+  </div>
+
+  <!-- 4张统计概览卡片 -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">跟单总资产</div>
+      <div class="stat-value">$3,542.80</div>
+      <div class="stat-sub pos">投入本金 $3,000.00 USDC</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">累计跟单净收益</div>
+      <div class="stat-value pos">+$542.80</div>
+      <div class="stat-sub pos">净回报率 +18.09%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">今日已结盈亏</div>
+      <div class="stat-value pos">+$86.40</div>
+      <div class="stat-sub" style="color:var(--text-muted)">共触发跟随平仓 3 笔</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">活跃跟单策略</div>
+      <div class="stat-value" id="active-count">2 个</div>
+      <div class="stat-sub" style="color:var(--text-dim)">强制止损平均线: 20%</div>
+    </div>
+  </div>
+
+  <!-- 跟单主体业务闭环卡片 (3大视图模块切换) -->
+  <div class="card">
+    <div class="main-nav-tabs">
+      <div class="main-tabs-left">
+        <button class="main-tab-btn active" data-tab="tab-strategies">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          正在运行的策略
+          <span class="tab-badge" id="badge-strat">2</span>
+        </button>
+        <button class="main-tab-btn" data-tab="tab-positions">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          实际同步持仓
+          <span class="tab-badge">2 笔</span>
+        </button>
+        <button class="main-tab-btn" data-tab="tab-fills">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          跟随成交历史
+          <span class="tab-badge">5 笔</span>
+        </button>
+      </div>
+
+      <div class="table-filter-tabs" id="strategy-filters">
+        <button class="table-filter-btn active" data-filter="all">全部 (2)</button>
+        <button class="table-filter-btn" data-filter="active">运行中 (2)</button>
+        <button class="table-filter-btn" data-filter="stopped">已终止 (0)</button>
+      </div>
+    </div>
+
+    <!-- 视图 1: 正在运行的策略列表 -->
+    <div class="view-panel" id="tab-strategies">
+      <table>
+        <thead class="thead">
+          <tr>
+            <th>跟单目标交易员</th>
+            <th>已分配本金</th>
+            <th>杠杆配置</th>
+            <th>止损保护</th>
+            <th>同步模式</th>
+            <th class="num">累计浮动盈亏</th>
+            <th class="num">累计已实现</th>
+            <th class="num">运行周期</th>
+            <th>状态</th>
+            <th class="num">策略操作</th>
+          </tr>
+        </thead>
+        <tbody id="strat-tbody">
+          <!-- 策略 1 -->
+          <tr data-status="active">
+            <td>
+              <div class="trader-cell">
+                <div class="trader-avatar">45</div>
+                <div>
+                  <div class="trader-name">
+                    <a href="code.html" style="color:#fff;text-decoration:none" title="查看详情">0x456f...01ac</a>
+                    <span class="badge-tag badge-long">聪明资金</span>
+                  </div>
+                  <span class="sub">30天胜率 72.4% · SOL/HYPE 波段</span>
+                </div>
+              </div>
+            </td>
+            <td style="font-weight:600;color:#fff">$1,000.00</td>
+            <td>1.0x (原比)</td>
+            <td style="color:var(--red)">-20.0%</td>
+            <td>全仓位同步</td>
+            <td class="num pos" style="font-weight:700">+$142.30 (+14.2%)</td>
+            <td class="num pos">+$54.20</td>
+            <td class="num" style="color:var(--text-dim)">3天 18h</td>
+            <td>
+              <span class="badge-tag badge-long" style="display:inline-flex;align-items:center;gap:4px">
+                <span style="width:5px;height:5px;border-radius:50%;background:var(--green)"></span>
+                自动跟随中
+              </span>
+            </td>
+            <td class="num">
+              <button class="tiny-btn" onclick="editStrategy('0x456f...01ac')">调整</button>
+              <button class="tiny-btn tiny-btn-danger" style="margin-left:4px" onclick="stopStrategy(this, '0x456f...01ac')">停止</button>
+            </td>
+          </tr>
+
+          <!-- 策略 2 -->
+          <tr data-status="active">
+            <td>
+              <div class="trader-cell">
+                <div class="trader-avatar" style="color:#60a5fa">9A</div>
+                <div>
+                  <div class="trader-name">
+                    <a href="code.html" style="color:#fff;text-decoration:none" title="查看详情">0x9a12...7e41</a>
+                    <span class="badge-tag badge-long" style="background:rgba(59,130,246,0.1);color:#60a5fa;border-color:rgba(59,130,246,0.25)">高频做市</span>
+                  </div>
+                  <span class="sub">30天胜率 81.5% · BTC 网格日内</span>
+                </div>
+              </div>
+            </td>
+            <td style="font-weight:600;color:#fff">$2,000.00</td>
+            <td>0.8x (保守)</td>
+            <td style="color:var(--red)">-15.0%</td>
+            <td>仅跟随新单</td>
+            <td class="num pos" style="font-weight:700">+$346.30 (+17.3%)</td>
+            <td class="num pos">+$198.50</td>
+            <td class="num" style="color:var(--text-dim)">12天 06h</td>
+            <td>
+              <span class="badge-tag badge-long" style="display:inline-flex;align-items:center;gap:4px">
+                <span style="width:5px;height:5px;border-radius:50%;background:var(--green)"></span>
+                自动跟随中
+              </span>
+            </td>
+            <td class="num">
+              <button class="tiny-btn" onclick="editStrategy('0x9a12...7e41')">调整</button>
+              <button class="tiny-btn tiny-btn-danger" style="margin-left:4px" onclick="stopStrategy(this, '0x9a12...7e41')">停止</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 视图 2: 实际同步持仓头寸明细 (解决“我当前到底持有了什么合约”的核心疑问) -->
+    <div class="view-panel" id="tab-positions" style="display:none">
+      <table>
+        <thead class="thead">
+          <tr>
+            <th>持仓标的 / 方向</th>
+            <th>所属策略源</th>
+            <th>开仓均价</th>
+            <th>当前标记价格</th>
+            <th class="num">持仓数量</th>
+            <th class="num">持仓名义价值</th>
+            <th class="num">未实现盈亏 (ROI)</th>
+            <th class="num">预估强平价</th>
+            <th class="num">独立平仓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-weight:700;color:#fff;font-size:13px">HYPE</span>
+                <span class="badge-tag badge-long">10x 多</span>
+              </div>
+            </td>
+            <td>
+              <a href="code.html" style="font-family:var(--font-mono);color:var(--text-dim);text-decoration:none">0x456f...01ac</a>
+            </td>
+            <td>$33.12</td>
+            <td style="color:#fff;font-weight:600">$37.46</td>
+            <td class="num">+15.80 HYPE</td>
+            <td class="num">$591.86</td>
+            <td class="num pos" style="font-weight:700">+$68.58 (+13.1%)</td>
+            <td class="num" style="color:var(--green-accent)">$29.80 (安全)</td>
+            <td class="num">
+              <button class="tiny-btn tiny-btn-danger" onclick="closeSinglePosition(this, 'HYPE')">市价平仓</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-weight:700;color:#fff;font-size:13px">SOL</span>
+                <span class="badge-tag badge-short">5x 空</span>
+              </div>
+            </td>
+            <td>
+              <a href="code.html" style="font-family:var(--font-mono);color:var(--text-dim);text-decoration:none">0x9a12...7e41</a>
+            </td>
+            <td>$168.20</td>
+            <td style="color:#fff;font-weight:600">$163.50</td>
+            <td class="num">-4.20 SOL</td>
+            <td class="num">$686.70</td>
+            <td class="num pos" style="font-weight:700">+$19.74 (+2.8%)</td>
+            <td class="num" style="color:var(--green-accent)">$198.40 (安全)</td>
+            <td class="num">
+              <button class="tiny-btn tiny-btn-danger" onclick="closeSinglePosition(this, 'SOL')">市价平仓</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 视图 3: 跟随成交明细流水 (解决“何时跟随开平仓、滑点和手续费是多少”的审计需求) -->
+    <div class="view-panel" id="tab-fills" style="display:none">
+      <table>
+        <thead class="thead">
+          <tr>
+            <th>成交时间</th>
+            <th>标的 / 操作</th>
+            <th>策略源交易员</th>
+            <th class="num">成交价格</th>
+            <th class="num">成交数量</th>
+            <th class="num">成交额 (USDC)</th>
+            <th class="num">滑点偏差</th>
+            <th class="num">手续费</th>
+            <th class="num">已结盈亏</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--text-muted)">15分钟前 14:32:01</td>
+            <td><span class="badge-tag badge-long">买入开多 HYPE</span></td>
+            <td><a href="code.html" style="font-family:var(--font-mono);color:var(--text-dim);text-decoration:none">0x456f...01ac</a></td>
+            <td class="num">$37.46</td>
+            <td class="num">15.80</td>
+            <td class="num">$591.86</td>
+            <td class="num" style="color:var(--green-accent)">0.02% (优)</td>
+            <td class="num">$0.18</td>
+            <td class="num" style="color:var(--text-muted)">--</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">2小时前 12:45:10</td>
+            <td><span class="badge-tag badge-short">卖出平多 ETH</span></td>
+            <td><a href="code.html" style="font-family:var(--font-mono);color:var(--text-dim);text-decoration:none">0x456f...01ac</a></td>
+            <td class="num">$2,680.50</td>
+            <td class="num">0.45</td>
+            <td class="num">$1,206.22</td>
+            <td class="num" style="color:var(--green-accent)">0.01%</td>
+            <td class="num">$0.36</td>
+            <td class="num pos" style="font-weight:700">+$54.20</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">5小时前 09:12:44</td>
+            <td><span class="badge-tag badge-short">卖出开空 SOL</span></td>
+            <td><a href="code.html" style="font-family:var(--font-mono);color:var(--text-dim);text-decoration:none">0x9a12...7e41</a></td>
+            <td class="num">$168.20</td>
+            <td class="num">4.20</td>
+            <td class="num">$706.44</td>
+            <td class="num" style="color:var(--green-accent)">0.03%</td>
+            <td class="num">$0.21</td>
+            <td class="num" style="color:var(--text-muted)">--</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">1天前 18:20:15</td>
+            <td><span class="badge-tag badge-long">买入平空 BTC</span></td>
+            <td><a href="code.html" style="font-family:var(--font-mono);color:var(--text-dim);text-decoration:none">0x9a12...7e41</a></td>
+            <td class="num">$96,400.00</td>
+            <td class="num">0.02</td>
+            <td class="num">$1,928.00</td>
+            <td class="num" style="color:var(--green-accent)">0.01%</td>
+            <td class="num">$0.58</td>
+            <td class="num pos" style="font-weight:700">+$144.30</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">2天前 10:14:02</td>
+            <td><span class="badge-tag badge-short">卖出开空 BTC</span></td>
+            <td><a href="code.html" style="font-family:var(--font-mono);color:var(--text-dim);text-decoration:none">0x9a12...7e41</a></td>
+            <td class="num">$97,850.00</td>
+            <td class="num">0.02</td>
+            <td class="num">$1,957.00</td>
+            <td class="num" style="color:var(--green-accent)">0.02%</td>
+            <td class="num">$0.59</td>
+            <td class="num" style="color:var(--text-muted)">--</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- 跟单参数调整弹窗 -->
+<div class="modal-backdrop" id="edit-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green-accent)" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+        调整跟单策略参数
+      </div>
+      <button class="modal-close" id="edit-modal-close" aria-label="关闭">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="target-trader">
+        <div class="target-info">
+          <span class="target-label">正在调整的跟单策略</span>
+          <span class="target-addr" id="edit-target-addr">0x456f...01ac</span>
+        </div>
+        <div class="target-stat">
+          <div class="target-stat-val pos">+12.4%</div>
+          <div class="target-stat-lab">当前已实现回报</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label-row">
+          <span class="form-label">调整跟单杠杆倍率</span>
+          <span class="form-extra" id="edit-ratio-display" style="color:var(--green-accent)">1.0x (原比例)</span>
+        </div>
+        <div class="slider-row">
+          <input type="range" class="range-slider" id="edit-ratio-slider" min="0.2" max="3.0" step="0.1" value="1.0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label-row">
+          <span class="form-label">强制止损阈值</span>
+          <span class="form-extra" style="color:var(--red)">亏损达限自动全平保护本金</span>
+        </div>
+        <div class="input-wrap">
+          <input type="number" class="form-input" id="edit-stop-loss" value="20" min="5" max="60">
+          <span class="input-unit">% 回撤</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" id="edit-btn-cancel">取消</button>
+      <button class="btn-confirm" id="edit-btn-confirm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        保存策略变更
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-msg" id="toast"></div>
+
+<script>
+const noticeBtn = document.getElementById('notice-btn');
+const noticeDropdown = document.getElementById('notice-dropdown');
+const walletBtn = document.getElementById('wallet-btn');
+const walletDropdown = document.getElementById('wallet-dropdown');
+
+noticeBtn.onclick = (e) => {
+  e.stopPropagation();
+  walletDropdown.classList.remove('open');
+  noticeDropdown.classList.toggle('open');
+};
+
+walletBtn.onclick = (e) => {
+  e.stopPropagation();
+  noticeDropdown.classList.remove('open');
+  walletDropdown.classList.toggle('open');
+};
+
+document.addEventListener('click', () => {
+  noticeDropdown.classList.remove('open');
+  walletDropdown.classList.remove('open');
+});
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function switchLang(lang) {
+  document.querySelectorAll('.lang-pill').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  showToast(lang === 'zh' ? '已切换系统语言：简体中文' : 'Switched language to English');
+}
+
+// 策略参数调整弹窗交互
+const editModal = document.getElementById('edit-modal');
+const editModalClose = document.getElementById('edit-modal-close');
+const editBtnCancel = document.getElementById('edit-btn-cancel');
+const editBtnConfirm = document.getElementById('edit-btn-confirm');
+const editTargetAddr = document.getElementById('edit-target-addr');
+const editRatioSlider = document.getElementById('edit-ratio-slider');
+const editRatioDisplay = document.getElementById('edit-ratio-display');
+const editStopLoss = document.getElementById('edit-stop-loss');
+
+const closeEditModal = () => editModal.classList.remove('open');
+editModalClose.onclick = closeEditModal;
+editBtnCancel.onclick = closeEditModal;
+editModal.onclick = (e) => { if (e.target === editModal) closeEditModal(); };
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && editModal.classList.contains('open')) closeEditModal();
+});
+
+editRatioSlider.oninput = function() {
+  const val = parseFloat(this.value);
+  let text = `${val.toFixed(1)}x`;
+  if (val === 1.0) text += ' (原比例)';
+  else if (val < 1.0) text += ' (保守跟单)';
+  else text += ' (激进放大)';
+  editRatioDisplay.textContent = text;
+};
+
+function editStrategy(addr) {
+  editTargetAddr.textContent = addr;
+  editModal.classList.add('open');
+}
+
+editBtnConfirm.onclick = () => {
+  editBtnConfirm.innerHTML = '正在同步上链...';
+  editBtnConfirm.style.opacity = '0.7';
+
+  setTimeout(() => {
+    editBtnConfirm.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> 保存策略变更`;
+    editBtnConfirm.style.opacity = '';
+    closeEditModal();
+    showToast(`策略 ${editTargetAddr.textContent} 参数已更新，止损线设为 -${editStopLoss.value}%`);
+  }, 600);
+};
+
+function stopStrategy(btn, addr) {
+  if (confirm(`确认终止对交易员 ${addr} 的跟单？\n关联未平仓位将按最新市价平仓回收本金。`)) {
+    const tr = btn.closest('tr');
+    tr.dataset.status = 'stopped';
+    tr.style.opacity = '0.4';
+    tr.querySelector('td:nth-child(9)').innerHTML = '<span class="badge-tag" style="background:#20252c;color:var(--text-muted)">已终止</span>';
+    btn.textContent = '已终止';
+    btn.disabled = true;
+    btn.previousElementSibling.style.display = 'none';
+    showToast(`已成功终止对 ${addr} 的跟单策略，本金及利润已归还至可用余额`);
+    const countEl = document.getElementById('nav-count');
+    const cur = parseInt(countEl.textContent);
+    if (cur > 0) {
+      countEl.textContent = cur - 1;
+      document.getElementById('active-count').textContent = `${cur - 1} 个`;
+      document.getElementById('badge-strat').textContent = `${cur - 1}`;
+    }
+  }
+}
+
+// 独立单笔持仓平仓
+function closeSinglePosition(btn, symbol) {
+  if (confirm(`确认立即平仓当前跟随持有的 ${symbol} 头寸？\n平仓将不影响整体跟单策略的持续运行。`)) {
+    const tr = btn.closest('tr');
+    tr.style.opacity = '0.3';
+    btn.textContent = '已平仓';
+    btn.disabled = true;
+    showToast(`已成功市价平仓 ${symbol} 头寸`);
+  }
+}
+
+// 三个主 Tab 视图切换 (正在运行的策略 | 实际同步持仓 | 跟随成交明细)
+const mainTabs = document.querySelectorAll('.main-tab-btn');
+const views = {
+  'tab-strategies': document.getElementById('tab-strategies'),
+  'tab-positions': document.getElementById('tab-positions'),
+  'tab-fills': document.getElementById('tab-fills'),
+};
+const stratFilterGroup = document.getElementById('strategy-filters');
+
+mainTabs.forEach(tab => {
+  tab.onclick = function() {
+    mainTabs.forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    const target = this.dataset.tab;
+    Object.keys(views).forEach(key => {
+      views[key].style.display = key === target ? '' : 'none';
+    });
+    // 仅在策略列表中显示筛选
+    stratFilterGroup.style.visibility = target === 'tab-strategies' ? 'visible' : 'hidden';
+  };
+});
+
+// 策略列表内部过滤：全部 / 运行中 / 已终止
+const filterBtns = document.querySelectorAll('.table-filter-btn');
+filterBtns.forEach(btn => {
+  btn.onclick = function() {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const filter = this.dataset.filter;
+    document.querySelectorAll('#strat-tbody tr').forEach(tr => {
+      if (filter === 'all') tr.style.display = '';
+      else if (filter === 'active') tr.style.display = tr.dataset.status === 'active' ? '' : 'none';
+      else if (filter === 'stopped') tr.style.display = tr.dataset.status === 'stopped' ? '' : 'none';
+    });
+  };
+});
+</script>
+</body>
+</html>

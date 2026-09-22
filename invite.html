@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SmartLiquid - 我的邀请与返佣返利</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #090a0b;
+  --panel: #111315;
+  --panel-card: #14171a;
+  --panel-hover: #181c21;
+  --panel-subtle: #0d0f11;
+  --border-subtle: #202429;
+  --border-strong: #2a3037;
+  --border-active: #3a424c;
+  --text-main: #f3f5f7;
+  --text-secondary: #c5cbd2;
+  --text-dim: #8b949e;
+  --text-muted: #57606a;
+  --green: #2ecc71;
+  --green-accent: #3dd68c;
+  --green-badge: rgba(46, 204, 113, 0.08);
+  --green-badge-border: rgba(46, 204, 113, 0.22);
+  --red: #f85149;
+  --orange: #e3b341;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+body { min-width: 1160px; }
+button, input { font: inherit; outline: none; border: none; }
+
+.app {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+}
+
+/* ========================================================
+   顶级导航栏 (平铺无嵌套、统一清晰)
+   ======================================================== */
+.topbar {
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+}
+.brand-logo-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #161a1e;
+  border: 1px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+}
+.brand-logo-badge svg { width: 15px; height: 15px; fill: var(--text-secondary); }
+.brand:hover .brand-logo-badge svg { fill: var(--green-accent); }
+.brand-word { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
+.brand-word b { color: var(--green-accent); }
+
+.platform-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.platform-link {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 8px 0;
+  position: relative;
+  transition: color 0.15s ease;
+}
+.platform-link:hover { color: #fff; }
+.platform-link.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+.platform-link.active::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  background: var(--green);
+  left: 0;
+  right: 0;
+  bottom: -14px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nav-btn-copy {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+.nav-btn-copy:hover {
+  background: #1b2025;
+  border-color: var(--border-strong);
+  color: #fff;
+}
+.nav-copy-badge {
+  padding: 0 5px;
+  height: 16px;
+  line-height: 15px;
+  border-radius: 8px;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  color: var(--green-accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.notice-wrap { position: relative; }
+.nav-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+}
+.nav-icon-btn:hover { background: #1c2126; color: #fff; border-color: var(--border-strong); }
+.nav-icon-btn svg { width: 14px; height: 14px; }
+.unread-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 5px;
+  height: 5px;
+  background: var(--green-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--green-accent);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 40px;
+  right: -10px;
+  width: 310px;
+  background: #13161a;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dropdown-menu.open { display: flex; }
+.dropdown-header {
+  padding: 10px 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #16191e;
+}
+.dropdown-clear { font-size: 10.5px; color: var(--text-muted); cursor: pointer; }
+.notice-item {
+  padding: 10px 14px;
+  border-bottom: 1px solid #191e23;
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+}
+.notice-item:hover { background: rgba(255, 255, 255, 0.02); }
+.notice-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--green-accent);
+  font-size: 10px;
+}
+.notice-title { font-size: 11.5px; color: #fff; font-weight: 500; }
+.notice-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.notice-time { font-size: 9px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 3px; }
+
+/* 钱包菜单 */
+.wallet-wrap { position: relative; }
+.nav-wallet-btn {
+  height: 32px;
+  padding: 0 10px 0 5px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.nav-wallet-btn:hover { background: #1c2126; border-color: var(--border-strong); }
+.avatar-jazz {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%);
+  display: grid;
+  place-items: center;
+}
+.wallet-addr { font-family: var(--font-mono); font-size: 12px; color: var(--text-main); font-weight: 600; }
+.wallet-balance {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green-accent);
+  background: rgba(46, 204, 113, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.wallet-down-arrow { width: 11px; height: 11px; color: var(--text-muted); }
+
+.wallet-dropdown {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  width: 280px;
+  background: #121519;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  padding: 8px;
+}
+.wallet-dropdown.open { display: flex; }
+.wallet-dd-header {
+  padding: 10px 12px;
+  background: #171b20;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+.wallet-dd-item {
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.wallet-dd-item:hover { background: #1a2026; color: #fff; }
+.wallet-dd-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.lang-switch-pills {
+  display: inline-flex;
+  background: #0d0f11;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 2px;
+  gap: 2px;
+}
+.lang-pill {
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.lang-pill:hover { color: #fff; }
+.lang-pill.active {
+  background: #1f252c;
+  color: #fff;
+  font-weight: 700;
+}
+.invite-reward-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  color: var(--green-accent);
+  font-family: var(--font-mono);
+}
+.wallet-dd-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 6px;
+}
+
+/* 面包屑返回行 */
+.breadcrumb-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.breadcrumb-link {
+  color: var(--text-dim);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s;
+}
+.breadcrumb-link:hover { color: #fff; }
+
+/* ========================================================
+   1. 邀请页面头部与概览
+   ======================================================== */
+.hero-header {
+  margin-bottom: 22px;
+}
+.hero-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: #ffffff;
+}
+.hero-subtitle {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* 核心返佣资产条 (4 列指标) */
+.invite-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.stat-label {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+.stat-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ========================================================
+   2. 邀请码与专属链接配置卡片 (核心区域)
+   ======================================================== */
+.invite-share-card {
+  background: linear-gradient(180deg, #13171b 0%, #101316 100%);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 22px 24px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.invite-share-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--green);
+}
+.share-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr 160px;
+  gap: 20px;
+  align-items: center;
+}
+.share-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.share-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.copy-box {
+  display: flex;
+  align-items: center;
+  background: #0c0e10;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  height: 42px;
+  padding: 0 4px 0 12px;
+  transition: border-color 0.15s;
+}
+.copy-box:focus-within { border-color: var(--border-active); }
+.copy-text-val {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #fff;
+  font-weight: 600;
+  user-select: all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.btn-copy-action {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 4px;
+  background: #171c22;
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+.btn-copy-action:hover {
+  background: #20262e;
+  border-color: var(--border-active);
+  color: #fff;
+}
+.btn-copy-action:active { transform: scale(0.98); }
+
+.rule-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 14px;
+  border-left: 1px solid var(--border-subtle);
+  gap: 4px;
+}
+.rule-rate {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--green-accent);
+}
+.rule-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ========================================================
+   3. 我的邀请列表卡片
+   ======================================================== */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-header-bar {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0f1114;
+}
+.table-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.table-main-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+.table-title-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.table-filter-tabs {
+  display: inline-flex;
+  background: #0c0e10;
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  padding: 2px;
+  gap: 2px;
+}
+.table-tab-btn {
+  padding: 5px 12px;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.table-tab-btn:hover { color: #fff; }
+.table-tab-btn.active {
+  background: #1c2126;
+  color: #fff;
+  font-weight: 600;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.thead {
+  color: var(--text-muted);
+  background: #0c0e10;
+}
+th {
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 11px;
+}
+th.num, td.num { text-align: right; }
+td {
+  padding: 13px 16px;
+  border-bottom: 1px solid #16191d;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+tbody tr:hover { background: rgba(255, 255, 255, 0.018); }
+
+.wallet-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-sans);
+}
+.wallet-avatar-sm {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #171b1f;
+  border: 1px solid var(--border-strong);
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.wallet-addr-txt {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #fff;
+  font-size: 12.5px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+}
+.status-active { background: var(--green-badge); color: var(--green-accent); border: 1px solid var(--green-badge-border); }
+.status-idle { background: rgba(255, 255, 255, 0.04); color: var(--text-muted); border: 1px solid var(--border-subtle); }
+
+.pos { color: var(--green-accent); }
+
+/* Toast */
+.toast-msg {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: #14181c;
+  border: 1px solid var(--border-strong);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast-msg.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 顶级导航栏：全站统一样式 -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a class="brand" href="square.html">
+        <div class="brand-logo-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.2L18.8 8 12 11.8 5.2 8 12 4.2zM5 9.8l6 3.3v7.1l-6-3.3V9.8zm8 10.4v-7.1l6-3.3v7.1l-6 3.3z"/></svg>
+        </div>
+        <span class="brand-word">SMART<b>LIQUID</b></span>
+      </a>
+      <nav class="platform-nav">
+        <a href="square.html" class="platform-link" title="跟单广场">跟单广场</a>
+        <a href="javascript:void(0)" class="platform-link" onclick="showToast('这期不做')">市场行情</a>
+        <a href="javascript:void(0)" class="platform-link" onclick="showToast('这期不做')">合约交易</a>
+      </nav>
+    </div>
+
+    <div class="topbar-right">
+      <!-- 我的跟单 (标准克隆/跟单图标) -->
+      <a href="copytrade.html" class="nav-btn-copy" title="查看我的跟单">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <span>我的跟单</span>
+        <span class="nav-copy-badge">2</span>
+      </a>
+
+      <!-- 通知铃铛 -->
+      <div class="notice-wrap">
+        <button class="nav-icon-btn" id="notice-btn" title="消息与成交通知">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span class="unread-dot" id="notice-dot"></span>
+        </button>
+        <div class="dropdown-menu" id="notice-dropdown">
+          <div class="dropdown-header">
+            <span>个人交易通知</span>
+            <span class="dropdown-clear" onclick="document.getElementById('notice-dot').style.display='none';showToast('已清空未读通知')">全部已读</span>
+          </div>
+          <div class="notice-item">
+            <div class="notice-icon">✓</div>
+            <div>
+              <div class="notice-title">邀请返佣结算入账</div>
+              <div class="notice-desc">被邀请好友 0xa14c 产生跟单手续费，已返佣 +18.42 USDC</div>
+              <div class="notice-time">1小时前</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 钱包与下拉 -->
+      <div class="wallet-wrap">
+        <div class="nav-wallet-btn" id="wallet-btn">
+          <div class="avatar-jazz">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+          </div>
+          <span class="wallet-addr">0x89C...3D4e</span>
+          <span class="wallet-balance">12,450 USDC</span>
+          <svg class="wallet-down-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+
+        <div class="wallet-dropdown" id="wallet-dropdown">
+          <div class="wallet-dd-header">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:10px;color:var(--text-muted)">当前网络: Arbitrum One</span>
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:14px;color:#fff;font-weight:700;margin-top:3px">12,450.00 USDC</div>
+          </div>
+
+          <div class="wallet-dd-item" style="cursor:default">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>系统语言</span>
+            </div>
+            <div class="lang-switch-pills">
+              <span class="lang-pill active" onclick="switchLang('zh')">中文</span>
+              <span class="lang-pill" onclick="switchLang('en')">EN</span>
+            </div>
+          </div>
+
+          <!-- 我的邀请 (当前所在页面) -->
+          <a class="wallet-dd-item" href="invite.html" style="background:#1a2026;color:#fff">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green-accent)" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7.5" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+              <span>我的邀请中心</span>
+            </div>
+            <span class="invite-reward-badge">返佣 20%</span>
+          </a>
+
+          <a class="wallet-dd-item" href="copytrade.html">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>我的跟单投资组合</span>
+            </div>
+            <span style="font-size:11px;color:var(--text-muted)">→</span>
+          </a>
+
+          <div class="wallet-dd-divider"></div>
+
+          <div class="wallet-dd-item" onclick="showToast('已复制钱包地址')">
+            <div class="wallet-dd-left">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>复制完整钱包地址</span>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted)">0x89C...3D4e</span>
+          </div>
+
+          <div class="wallet-dd-item" style="color:#ff757e" onclick="showToast('已断开连接')">
+            <div class="wallet-dd-left">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>断开钱包连接</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 面包屑返回 -->
+  <div class="breadcrumb-row">
+    <a href="square.html" class="breadcrumb-link">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      跟单广场
+    </a>
+    <span>/</span>
+    <span style="color:#fff;font-weight:600">我的邀请与返利返佣</span>
+  </div>
+
+  <!-- 1. 页面标题 -->
+  <section class="hero-header">
+    <h1 class="hero-title">邀请好友 · 共享交易流动性分润</h1>
+    <p class="hero-subtitle">邀请好友绑定 SmartLiquid 执行跟单交易，永久获得其交易手续费 20% 的现金返佣，实时自动结算入账</p>
+  </section>
+
+  <!-- 核心返佣资产条 (4 列指标) -->
+  <section class="invite-stats-grid">
+    <div class="stat-card">
+      <span class="stat-label">累计返佣收益 (USDC)</span>
+      <span class="stat-value pos">+$1,482.50</span>
+      <span class="stat-sub">实时结算入钱包余额</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">成功邀请好友数</span>
+      <span class="stat-value">12 <span style="font-size:13px;font-weight:500;color:var(--text-muted)">人</span></span>
+      <span class="stat-sub">活跃交易 8 人</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">好友累计交易量</span>
+      <span class="stat-value">$7.42M</span>
+      <span class="stat-sub">贡献手续费 $7,412.50</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">当前返佣比例</span>
+      <span class="stat-value" style="color:var(--green-accent)">20%</span>
+      <span class="stat-sub">最高等级返佣特权</span>
+    </div>
+  </section>
+
+  <!-- 2. 邀请码与专属链接配置卡片 (核心区域) -->
+  <section class="invite-share-card">
+    <div class="share-grid">
+      <!-- 邀请码 -->
+      <div class="share-block">
+        <span class="share-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+          我的专属邀请码
+        </span>
+        <div class="copy-box">
+          <span class="copy-text-val" id="code-val">SMART-8888</span>
+          <button class="btn-copy-action" onclick="copyText('SMART-8888', '邀请码已复制')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            复制邀请码
+          </button>
+        </div>
+      </div>
+
+      <!-- 专属邀请链接 -->
+      <div class="share-block">
+        <span class="share-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+          专属邀请注册链接
+        </span>
+        <div class="copy-box">
+          <span class="copy-text-val" id="link-val">https://smartliquid.io/join?ref=SMART-8888</span>
+          <button class="btn-copy-action" onclick="copyText('https://smartliquid.io/join?ref=SMART-8888', '邀请链接已复制')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            复制专属链接
+          </button>
+        </div>
+      </div>
+
+      <!-- 比例权益说明 -->
+      <div class="rule-box">
+        <span class="rule-rate">20% 返佣</span>
+        <span class="rule-desc">好友每笔跟单均可返现，实时划转至 Arbitrum 账户。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 我的邀请列表卡片 -->
+  <section class="card">
+    <div class="table-header-bar">
+      <div class="table-title-group">
+        <span class="table-main-title">我的邀请列表 (12)</span>
+        <span class="table-title-sub">记录已绑定的受邀地址、交易活跃度及已为您创造的返佣明细</span>
+      </div>
+
+      <div class="table-filter-tabs">
+        <button class="table-tab-btn active" data-filter="all">全部 (12)</button>
+        <button class="table-tab-btn" data-filter="active">交易中 (8)</button>
+        <button class="table-tab-btn" data-filter="idle">未激活 (4)</button>
+      </div>
+    </div>
+
+    <table>
+      <thead class="thead">
+        <tr>
+          <th>被邀请好友钱包</th>
+          <th>注册绑定时间</th>
+          <th>状态</th>
+          <th class="num">累计跟单交易量</th>
+          <th class="num">贡献手续费</th>
+          <th class="num">累计已返佣 (USDC)</th>
+          <th class="num">最近交易时间</th>
+        </tr>
+      </thead>
+      <tbody id="invite-table-body">
+        <!-- 好友 1 -->
+        <tr data-status="active">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:var(--green-accent)">A1</div>
+              <span class="wallet-addr-txt">0xa14c...5e29</span>
+            </div>
+          </td>
+          <td>2025-05-10 14:22</td>
+          <td><span class="status-pill status-active">● 跟单交易中</span></td>
+          <td class="num">$1,890,200</td>
+          <td class="num">$1,890.20</td>
+          <td class="num pos" style="font-weight:700">+$378.04</td>
+          <td class="num" style="color:#fff">1小时前</td>
+        </tr>
+
+        <!-- 好友 2 -->
+        <tr data-status="active">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:#60a5fa">B7</div>
+              <span class="wallet-addr-txt">0xb792...88df</span>
+            </div>
+          </td>
+          <td>2025-05-08 09:15</td>
+          <td><span class="status-pill status-active">● 跟单交易中</span></td>
+          <td class="num">$1,420,000</td>
+          <td class="num">$1,420.00</td>
+          <td class="num pos" style="font-weight:700">+$284.00</td>
+          <td class="num" style="color:#fff">3小时前</td>
+        </tr>
+
+        <!-- 好友 3 -->
+        <tr data-status="active">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:#e5be79">C3</div>
+              <span class="wallet-addr-txt">0xc319...0911</span>
+            </div>
+          </td>
+          <td>2025-05-02 20:41</td>
+          <td><span class="status-pill status-active">● 跟单交易中</span></td>
+          <td class="num">$1,150,400</td>
+          <td class="num">$1,150.40</td>
+          <td class="num pos" style="font-weight:700">+$230.08</td>
+          <td class="num" style="color:#fff">1天前</td>
+        </tr>
+
+        <!-- 好友 4 -->
+        <tr data-status="active">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:#a78bfa">9E</div>
+              <span class="wallet-addr-txt">0x9e55...341f</span>
+            </div>
+          </td>
+          <td>2025-04-28 11:05</td>
+          <td><span class="status-pill status-active">● 跟单交易中</span></td>
+          <td class="num">$980,000</td>
+          <td class="num">$980.00</td>
+          <td class="num pos" style="font-weight:700">+$196.00</td>
+          <td class="num" style="color:#fff">2天前</td>
+        </tr>
+
+        <!-- 好友 5 -->
+        <tr data-status="active">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:#f87171">5D</div>
+              <span class="wallet-addr-txt">0x5df1...77a8</span>
+            </div>
+          </td>
+          <td>2025-04-25 18:30</td>
+          <td><span class="status-pill status-active">● 跟单交易中</span></td>
+          <td class="num">$740,200</td>
+          <td class="num">$740.20</td>
+          <td class="num pos" style="font-weight:700">+$148.04</td>
+          <td class="num" style="color:#fff">4天前</td>
+        </tr>
+
+        <!-- 好友 6 -->
+        <tr data-status="active">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm" style="color:#38bdf8">8F</div>
+              <span class="wallet-addr-txt">0x8f22...192b</span>
+            </div>
+          </td>
+          <td>2025-04-20 08:12</td>
+          <td><span class="status-pill status-active">● 跟单交易中</span></td>
+          <td class="num">$620,000</td>
+          <td class="num">$620.00</td>
+          <td class="num pos" style="font-weight:700">+$124.00</td>
+          <td class="num" style="color:#fff">5天前</td>
+        </tr>
+
+        <!-- 好友 7 -->
+        <tr data-status="active">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm">44</div>
+              <span class="wallet-addr-txt">0x44ab...901c</span>
+            </div>
+          </td>
+          <td>2025-04-18 16:45</td>
+          <td><span class="status-pill status-active">● 跟单交易中</span></td>
+          <td class="num">$380,500</td>
+          <td class="num">$380.50</td>
+          <td class="num pos" style="font-weight:700">+$76.10</td>
+          <td class="num" style="color:#fff">6天前</td>
+        </tr>
+
+        <!-- 好友 8 -->
+        <tr data-status="active">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm">18</div>
+              <span class="wallet-addr-txt">0x18cc...44da</span>
+            </div>
+          </td>
+          <td>2025-04-12 12:20</td>
+          <td><span class="status-pill status-active">● 跟单交易中</span></td>
+          <td class="num">$231,200</td>
+          <td class="num">$231.20</td>
+          <td class="num pos" style="font-weight:700">+$46.24</td>
+          <td class="num" style="color:#fff">8天前</td>
+        </tr>
+
+        <!-- 好友 9 (未激活) -->
+        <tr data-status="idle">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm">E2</div>
+              <span class="wallet-addr-txt">0xe211...00bc</span>
+            </div>
+          </td>
+          <td>2025-05-12 10:00</td>
+          <td><span class="status-pill status-idle">未产生交易</span></td>
+          <td class="num">$0</td>
+          <td class="num">$0.00</td>
+          <td class="num" style="color:var(--text-muted)">$0.00</td>
+          <td class="num" style="color:var(--text-muted)">--</td>
+        </tr>
+
+        <!-- 好友 10 (未激活) -->
+        <tr data-status="idle">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm">73</div>
+              <span class="wallet-addr-txt">0x73ff...aa12</span>
+            </div>
+          </td>
+          <td>2025-05-11 15:30</td>
+          <td><span class="status-pill status-idle">未产生交易</span></td>
+          <td class="num">$0</td>
+          <td class="num">$0.00</td>
+          <td class="num" style="color:var(--text-muted)">$0.00</td>
+          <td class="num" style="color:var(--text-muted)">--</td>
+        </tr>
+
+        <!-- 好友 11 (未激活) -->
+        <tr data-status="idle">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm">29</div>
+              <span class="wallet-addr-txt">0x2988...31cc</span>
+            </div>
+          </td>
+          <td>2025-05-09 22:18</td>
+          <td><span class="status-pill status-idle">未产生交易</span></td>
+          <td class="num">$0</td>
+          <td class="num">$0.00</td>
+          <td class="num" style="color:var(--text-muted)">$0.00</td>
+          <td class="num" style="color:var(--text-muted)">--</td>
+        </tr>
+
+        <!-- 好友 12 (未激活) -->
+        <tr data-status="idle">
+          <td>
+            <div class="wallet-cell">
+              <div class="wallet-avatar-sm">60</div>
+              <span class="wallet-addr-txt">0x6001...88ab</span>
+            </div>
+          </td>
+          <td>2025-05-05 19:40</td>
+          <td><span class="status-pill status-idle">未产生交易</span></td>
+          <td class="num">$0</td>
+          <td class="num">$0.00</td>
+          <td class="num" style="color:var(--text-muted)">$0.00</td>
+          <td class="num" style="color:var(--text-muted)">--</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<!-- 提示框 Toast -->
+<div class="toast-msg" id="toast"></div>
+
+<script>
+// 顶部下拉交互
+const noticeBtn = document.getElementById('notice-btn');
+const noticeDropdown = document.getElementById('notice-dropdown');
+const walletBtn = document.getElementById('wallet-btn');
+const walletDropdown = document.getElementById('wallet-dropdown');
+
+noticeBtn.onclick = (e) => {
+  e.stopPropagation();
+  walletDropdown.classList.remove('open');
+  noticeDropdown.classList.toggle('open');
+};
+walletBtn.onclick = (e) => {
+  e.stopPropagation();
+  noticeDropdown.classList.remove('open');
+  walletDropdown.classList.toggle('open');
+};
+document.addEventListener('click', () => {
+  noticeDropdown.classList.remove('open');
+  walletDropdown.classList.remove('open');
+});
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2600);
+}
+
+function switchLang(lang) {
+  document.querySelectorAll('.lang-pill').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  showToast(lang === 'zh' ? '已切换系统语言：简体中文' : 'Switched language to English');
+}
+
+async function copyText(txt, successMsg) {
+  try {
+    await navigator.clipboard.writeText(txt);
+  } catch(e) {}
+  showToast(successMsg);
+}
+
+// 列表筛选
+const tabBtns = document.querySelectorAll('.table-tab-btn');
+const rows = document.querySelectorAll('#invite-table-body tr');
+
+tabBtns.forEach(btn => {
+  btn.onclick = function() {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const filter = this.dataset.filter;
+
+    rows.forEach(row => {
+      if (filter === 'all' || row.dataset.status === filter) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+    showToast(`已筛选：${this.textContent.trim()}`);
+  };
+});
+</script>
+</body>
+</html>

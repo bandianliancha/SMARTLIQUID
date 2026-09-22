@@ -1,0 +1,3089 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SmartLiquid 钱包追踪 - 钱包详情</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #090a0b;
+  --panel: #111315;
+  --panel-card: #15181b;
+  --panel-subtle: #1a1e22;
+  --border-subtle: #202429;
+  --border-strong: #2a3037;
+  --border-active: #3a424c;
+  --text-main: #f3f5f7;
+  --text-secondary: #c5cbd2;
+  --text-dim: #8b949e;
+  --text-muted: #57606a;
+  --green: #2ecc71;
+  --green-accent: #3dd68c;
+  --green-badge: rgba(46, 204, 113, 0.08);
+  --green-badge-border: rgba(46, 204, 113, 0.22);
+  --red: #f85149;
+  --red-badge: rgba(248, 81, 73, 0.08);
+  --red-badge-border: rgba(248, 81, 73, 0.22);
+  --orange: #e3b341;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+body { min-width: 1140px; }
+button, input { font: inherit; outline: none; border: none; }
+
+.app {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 16px 24px 36px;
+}
+
+/* ========================================================
+   顶级导航栏 (平铺无嵌套、统一清晰)
+   ======================================================== */
+.topbar {
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 16px;
+  position: relative;
+}
+
+/* 左侧品牌与主频道：仅 跟单广场 | 市场行情 | 合约交易 */
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+}
+.brand-logo-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #161a1e;
+  border: 1px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+}
+.brand-logo-badge svg { width: 15px; height: 15px; fill: var(--text-secondary); }
+.brand:hover .brand-logo-badge svg { fill: var(--green-accent); }
+.brand-word { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
+.brand-word b { color: var(--green-accent); }
+
+.platform-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.platform-link {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 8px 0;
+  position: relative;
+  transition: color 0.15s ease;
+}
+.platform-link:hover { color: #fff; }
+.platform-link.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+.platform-link.active::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  background: var(--green);
+  left: 0;
+  right: 0;
+  bottom: -14px;
+}
+
+/* 右侧个人功能区：纯平铺，绝不 box 套 box */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* 我的跟单按钮 */
+.nav-btn-copy {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+.nav-btn-copy:hover {
+  background: #1b2025;
+  border-color: var(--border-strong);
+  color: #fff;
+}
+.nav-btn-copy.active {
+  background: #152219;
+  border-color: rgba(46, 204, 113, 0.4);
+  color: #fff;
+}
+.nav-copy-badge {
+  padding: 0 5px;
+  height: 16px;
+  line-height: 15px;
+  border-radius: 8px;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  color: var(--green-accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* 通知铃铛 */
+.notice-wrap { position: relative; }
+.nav-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+}
+.nav-icon-btn:hover {
+  background: #1c2126;
+  color: #fff;
+  border-color: var(--border-strong);
+}
+.nav-icon-btn svg { width: 14px; height: 14px; }
+.unread-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 5px;
+  height: 5px;
+  background: var(--green-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--green-accent);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 40px;
+  right: -10px;
+  width: 310px;
+  background: #13161a;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dropdown-menu.open { display: flex; }
+.dropdown-header {
+  padding: 10px 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #16191e;
+}
+.dropdown-clear { font-size: 10.5px; color: var(--text-muted); cursor: pointer; }
+.notice-item {
+  padding: 10px 14px;
+  border-bottom: 1px solid #191e23;
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+}
+.notice-item:hover { background: rgba(255, 255, 255, 0.02); }
+.notice-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--green-accent);
+  font-size: 10px;
+}
+.notice-title { font-size: 11.5px; color: #fff; font-weight: 500; }
+.notice-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.notice-time { font-size: 9px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 3px; }
+
+/* 钱包卡片 */
+.wallet-wrap { position: relative; }
+.nav-wallet-btn {
+  height: 32px;
+  padding: 0 10px 0 5px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.nav-wallet-btn:hover {
+  background: #1c2126;
+  border-color: var(--border-strong);
+}
+.avatar-jazz {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%);
+  display: grid;
+  place-items: center;
+}
+.wallet-addr {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-main);
+  font-weight: 600;
+}
+.wallet-balance {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green-accent);
+  background: rgba(46, 204, 113, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.wallet-down-arrow { width: 11px; height: 11px; color: var(--text-muted); }
+
+.wallet-dropdown {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  width: 280px;
+  background: #121519;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  padding: 8px;
+}
+.wallet-dropdown.open { display: flex; }
+.wallet-dd-header {
+  padding: 10px 12px;
+  background: #171b20;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+.wallet-dd-sec-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 10px 4px;
+}
+.wallet-dd-item {
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.wallet-dd-item:hover { background: #1a2026; color: #fff; }
+.wallet-dd-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.lang-switch-pills {
+  display: inline-flex;
+  background: #0d0f11;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 2px;
+  gap: 2px;
+}
+.lang-pill {
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.lang-pill:hover { color: #fff; }
+.lang-pill.active {
+  background: #1f252c;
+  color: #fff;
+  font-weight: 700;
+}
+.invite-reward-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  color: var(--green-accent);
+  font-family: var(--font-mono);
+}
+.wallet-dd-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 6px;
+}
+
+/* 钱包地址与状态行 */
+.wallet-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0 14px;
+  color: var(--text-dim);
+  font-size: 12.5px;
+}
+.wallet-left { display: flex; align-items: center; gap: 9px; }
+.back-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  transition: all 0.15s;
+}
+.back-link:hover { color: #fff; border-color: var(--border-strong); background: #14171a; }
+.wallet-tag { color: var(--text-muted); font-size: 12px; }
+.wallet-address { font-family: var(--font-mono); color: #f0f3f6; font-size: 12.5px; font-weight: 600; }
+.tiny-btn {
+  height: 25px;
+  padding: 0 9px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  background: #14171a;
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.tiny-btn:hover { background: #1c2126; border-color: var(--border-strong); color: #fff; }
+.tiny-btn:active { transform: scale(0.98); }
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #121518;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  font-size: 11.5px;
+}
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  display: inline-block;
+  box-shadow: 0 0 6px var(--green);
+}
+
+/* 核心网格布局 */
+.main-grid {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+.card {
+  border: 1px solid var(--border-subtle);
+  background: var(--panel);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* 左侧概览面板 (Summary) */
+.summary {
+  padding: 16px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sum-sec { padding: 0; border: 0; }
+.sum-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.equity {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.05;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+.label { font-size: 10.5px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+.cohort { font-size: 10px; color: var(--text-dim); text-align: right; line-height: 1.35; }
+.cohort strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--green-accent);
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  padding: 1px 6px;
+  background: var(--green-badge);
+  border-radius: 4px;
+  border: 1px solid var(--green-badge-border);
+}
+
+/* 资产配比条 */
+.alloc {
+  height: 18px;
+  display: flex;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 10px;
+  border: 1px solid var(--border-subtle);
+  background: #0d0f11;
+}
+.alloc span { display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 600; }
+.alloc .perp { width: 88%; background: #18241d; color: #8be4af; border-right: 1px solid #0d0f11; }
+.alloc .spot { width: 12%; background: #282216; color: #e5be79; }
+
+/* 交易特征双卡片 */
+.profile-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.profile-card {
+  height: 76px;
+  border-radius: 6px;
+  background: var(--panel-card);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+.profile-card .info {
+  position: absolute;
+  right: 7px;
+  top: 7px;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  font-size: 9px;
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: help;
+}
+.bias-big { color: var(--green-accent); font-size: 15px; font-weight: 700; }
+.bias-sub { color: var(--text-muted); font-size: 10px; margin-top: 4px; }
+.gauge-wrap { position: relative; width: 88px; height: 36px; margin: 0 auto; }
+.gauge-svg { width: 88px; height: 44px; display: block; }
+.gauge-num { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: #fff; margin-top: -8px; line-height: 1; }
+.gauge-lab { font-size: 9.5px; color: var(--text-muted); margin-top: 2px; }
+
+/* 过滤筛选条 */
+.filter-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 2px 0; }
+.switchline, .periods {
+  display: inline-flex;
+  background: #0d0f11;
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  padding: 2px;
+  gap: 2px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  line-height: 1;
+  color: var(--text-dim);
+  padding: 5px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.pill:hover { color: #fff; }
+.pill.on { background: #1c2126; color: #fff; font-weight: 600; }
+
+/* 数据行与迷你趋势 */
+.data-row {
+  height: 50px;
+  border-radius: 6px;
+  background: var(--panel-card);
+  border: 1px solid var(--border-subtle);
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+}
+.data-title { font-size: 10.5px; color: var(--text-dim); white-space: nowrap; }
+.data-value { font-family: var(--font-mono); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.spark { width: 100%; height: 22px; display: block; }
+.amount { font-family: var(--font-mono); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.neg { color: var(--red); }
+.pos { color: var(--green-accent); }
+
+.volume-row {
+  height: 42px;
+  border-radius: 6px;
+  background: var(--panel-card);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+.volume-row .v { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--text-secondary); }
+
+.mini-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.mini {
+  background: var(--panel-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  padding: 7px 8px;
+  text-align: center;
+}
+.mini span { display: block; color: var(--text-muted); font-size: 9px; font-weight: 500; }
+.mini b { display: block; margin-top: 3px; font-size: 11.5px; font-family: var(--font-mono); font-weight: 700; color: #fff; }
+
+/* 跟单按钮 */
+.copytrade {
+  width: 100%;
+  height: 34px;
+  border-radius: 6px;
+  background: #171b1f;
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  color: var(--green-accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.copytrade:hover {
+  background: #1e242a;
+  border-color: var(--green);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+.copytrade:active { transform: scale(0.99); }
+.copyhint { text-align: center; color: var(--text-muted); font-size: 9.5px; margin-top: -3px; }
+
+/* 右侧走势图表面板 (Chart) */
+.chart { display: flex; flex-direction: column; }
+.chart-head {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: #0f1114;
+}
+.tools { display: flex; align-items: center; gap: 6px; }
+.tool-group {
+  display: inline-flex;
+  background: #0d0f11;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 2px;
+  gap: 2px;
+}
+.tool {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--text-dim);
+  padding: 3px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.tool:hover { color: #fff; }
+.tool.on { background: #1e2329; color: #fff; font-weight: 600; }
+.chart-title { font-size: 10.5px; color: var(--text-muted); text-align: right; }
+.chart-title strong {
+  display: block;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.chart-area {
+  position: relative;
+  flex: 1;
+  min-height: 380px;
+  padding: 14px 16px 12px;
+  background: #0e1012;
+}
+.chart-area svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.watermark {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  font-weight: 900;
+  font-size: 38px;
+  color: rgba(255, 255, 255, 0.02);
+  letter-spacing: 6px;
+  pointer-events: none;
+  user-select: none;
+}
+.axis { fill: #464f58; font-size: 10px; font-family: var(--font-mono); font-weight: 500; }
+.grid { stroke: #181c20; stroke-width: 1; }
+.area { fill: url(#grad); }
+.line { fill: none; stroke: var(--green); stroke-width: 1.8; }
+.step { fill: none; stroke: #d06d48; stroke-width: 1.1; stroke-dasharray: 4 4; opacity: 0.7; }
+.dot { fill: var(--green); stroke: #0e1012; stroke-width: 3; }
+.chart-tooltip-guide { stroke: rgba(255, 255, 255, 0.12); stroke-width: 1; stroke-dasharray: 3 3; }
+
+/* 底部数据表格卡片 (Table) */
+.table-wrap { margin-top: 16px; }
+.tabs {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: #0f1114;
+  padding: 0 6px;
+}
+.tab {
+  height: 42px;
+  padding: 0 16px;
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  position: relative;
+}
+.tab:hover { color: #fff; }
+.tab.active {
+  color: #ffffff;
+  font-weight: 600;
+  border-color: var(--green);
+  background: rgba(255, 255, 255, 0.02);
+}
+.table-meta {
+  margin-left: auto;
+  padding-right: 14px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.table-meta b { color: var(--green-accent); font-family: var(--font-mono); font-weight: 700; margin-left: 3px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.thead { color: var(--text-muted); background: #0c0e10; }
+th {
+  font-weight: 600;
+  text-align: left;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 11px;
+  letter-spacing: 0.2px;
+}
+th.num, td.num { text-align: right; }
+td {
+  padding: 13px 14px;
+  border-bottom: 1px solid #16191d;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+tbody tr:hover { background: rgba(255, 255, 255, 0.015); }
+.coin { display: flex; align-items: center; gap: 10px; font-family: var(--font-sans); }
+.coinico {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #171b1f;
+  border: 1px solid var(--border-strong);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+.coin-name { font-weight: 700; color: #fff; font-size: 12.5px; }
+.sub { display: block; color: var(--text-muted); font-size: 10px; margin-top: 2px; font-family: var(--font-sans); font-weight: 400; }
+.liq-wrapper { display: inline-flex; flex-direction: column; align-items: flex-end; }
+.liqbar { width: 65px; height: 4px; background: #1c2024; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+.liqbar i { display: block; height: 100%; border-radius: 4px; }
+.badge-tag {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 9.5px;
+  font-weight: 600;
+  margin-left: 3px;
+}
+.badge-short { background: var(--red-badge); color: #ff7b72; border: 1px solid var(--red-badge-border); }
+.badge-long { background: var(--green-badge); color: var(--green-accent); border: 1px solid var(--green-badge-border); }
+.hidden { display: none; }
+.empty-panel { padding: 42px; text-align: center; color: var(--text-muted); font-size: 12px; }
+
+/* ========================================================
+   已关闭交易 - 深度历史交易复盘专属样式
+   ======================================================== */
+.closed-summary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #111417;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.closed-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.period-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.period-select-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: #171b20;
+  border: 1px solid var(--border-strong);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.period-select-btn:hover { background: #1f252c; border-color: var(--border-active); }
+.summary-stat-group {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.summary-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.summary-stat-label {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.summary-stat-val {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+.closed-summary-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ratio-title {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.ratio-track-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 220px;
+}
+.ratio-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+.ratio-bar-strip {
+  height: 6px;
+  border-radius: 3px;
+  display: flex;
+  overflow: hidden;
+  background: #1f2328;
+}
+.ratio-seg-long {
+  background: var(--green-accent);
+  transition: width 0.3s;
+}
+.ratio-seg-short {
+  background: var(--red);
+  transition: width 0.3s;
+}
+
+/* 展开行样式 */
+.tr-clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.tr-clickable:hover { background: #161a1f !important; }
+.tr-clickable.expanded {
+  background: #14181d !important;
+  border-bottom-color: transparent;
+}
+.expand-toggle-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  background: #181d22;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  font-size: 10px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tr-clickable.expanded .expand-toggle-btn {
+  transform: rotate(90deg);
+  background: #202730;
+  color: #fff;
+  border-color: var(--border-active);
+}
+
+/* 复盘抽屉容器 */
+.replay-drawer-row {
+  background: #0d0f12 !important;
+  padding: 0 !important;
+  border-bottom: 2px solid var(--border-subtle);
+}
+.replay-drawer-row td {
+  padding: 0 !important;
+}
+.replay-content-box {
+  padding: 16px 20px 22px;
+  background: #0d0f12;
+  border-top: 1px solid #1c2229;
+}
+
+/* 抽屉顶部二级导航 */
+.drawer-subnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 10px;
+}
+.drawer-subtabs {
+  display: inline-flex;
+  gap: 6px;
+  background: #12161a;
+  border: 1px solid var(--border-subtle);
+  padding: 3px;
+  border-radius: 6px;
+}
+.drawer-subtab-btn {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.drawer-subtab-btn:hover { color: #fff; }
+.drawer-subtab-btn.active {
+  background: #1e252d;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.drawer-timeframe-btn {
+  height: 28px;
+  padding: 0 10px;
+  background: #14181d;
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.drawer-timeframe-btn:hover { color: #fff; border-color: var(--border-strong); }
+
+/* 复盘两栏网格 */
+.replay-grid {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 16px;
+}
+
+/* 左侧走势图卡片 */
+.replay-chart-card {
+  background: #121519;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+}
+.chart-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.chart-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+.chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.dot-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.replay-svg-wrap {
+  width: 100%;
+  height: 270px;
+  position: relative;
+}
+.replay-svg-wrap svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* 右侧深度量化指标卡片 */
+.replay-metrics-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 费用指标栏 */
+.metrics-fee-box {
+  background: #121519;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.fee-col { display: flex; flex-direction: column; gap: 3px; }
+.fee-col-label { font-size: 10.5px; color: var(--text-muted); }
+.fee-col-val { font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; color: #fff; }
+
+/* 交易区间标尺卡片 (MAE 到 MFE) */
+.metrics-range-box {
+  background: #121519;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.range-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+}
+.range-rule-track {
+  position: relative;
+  height: 10px;
+  background: #1b2026;
+  border-radius: 5px;
+  margin: 18px 0 14px;
+}
+.range-seg-adverse {
+  position: absolute;
+  left: 0;
+  width: 6%;
+  height: 100%;
+  background: rgba(248, 81, 73, 0.4);
+  border-radius: 5px 0 0 5px;
+}
+.range-seg-favorable {
+  position: absolute;
+  left: 6%;
+  width: 94%;
+  height: 100%;
+  background: rgba(46, 204, 113, 0.35);
+  border-radius: 0 5px 5px 0;
+}
+.range-pin-entry {
+  position: absolute;
+  left: 6%;
+  top: -16px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.range-pin-entry span {
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.range-pin-entry i {
+  width: 2px;
+  height: 26px;
+  background: #fff;
+  display: block;
+}
+.range-pin-exit {
+  position: absolute;
+  left: 68%;
+  top: -16px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.range-pin-exit span {
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+  color: var(--green-accent);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.range-pin-exit i {
+  width: 2px;
+  height: 26px;
+  background: var(--green-accent);
+  display: block;
+}
+.range-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+/* 浮亏时间、入场质量、机会捕获三项指标排布 */
+.metrics-eval-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.eval-card {
+  background: #121519;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.eval-card-label {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.eval-card-num {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+}
+.eval-card-grade {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* 自动分析文字结论气泡 */
+.metrics-analysis-narrative {
+  background: #14181d;
+  border: 1px solid #1f2731;
+  border-left: 3px solid var(--green);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+.metrics-analysis-narrative b { color: #fff; font-weight: 600; }
+
+/* Fills 详情视图面板 */
+.drawer-fills-panel {
+  background: #121519;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* 跟单配置弹窗 (Modal) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-backdrop.open { opacity: 1; pointer-events: auto; }
+.modal-box {
+  width: 460px;
+  background: #111316;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  transform: scale(0.96) translateY(8px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-backdrop.open .modal-box { transform: scale(1) translateY(0); }
+.modal-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  background: #14171b;
+}
+.modal-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.modal-close:hover { background: #1f252c; color: #fff; }
+.modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.target-trader {
+  background: #16191d;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.target-info { display: flex; flex-direction: column; gap: 3px; }
+.target-label { font-size: 10.5px; color: var(--text-muted); }
+.target-addr { font-family: var(--font-mono); font-size: 12px; color: #fff; font-weight: 600; }
+.target-stat { text-align: right; }
+.target-stat-val { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--green-accent); }
+.target-stat-lab { font-size: 10px; color: var(--text-muted); }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label-row { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; }
+.form-label { color: var(--text-secondary); font-weight: 500; }
+.form-extra { color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; }
+.input-wrap { position: relative; display: flex; align-items: center; }
+.form-input {
+  width: 100%;
+  height: 38px;
+  background: #0d0f11;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0 54px 0 12px;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.form-input:focus { border-color: var(--border-active); background: #121518; }
+.input-unit {
+  position: absolute;
+  right: 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.slider-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+.range-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  background: #202429;
+  border-radius: 2px;
+  outline: none;
+}
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #111316;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+}
+.range-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.quick-chips { display: flex; gap: 6px; margin-top: 6px; }
+.chip {
+  flex: 1;
+  padding: 5px 0;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+.chip:hover { color: #fff; border-color: var(--border-strong); }
+.chip.active { background: #1f252c; color: #fff; border-color: var(--border-active); font-weight: 600; }
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background: #13161a;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.check-box {
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  border: 1px solid var(--border-strong);
+  background: #0d0f11;
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.check-row.checked .check-box { background: var(--green); border-color: var(--green); }
+.check-box svg { width: 10px; height: 10px; stroke: #090a0b; display: none; }
+.check-row.checked .check-box svg { display: block; }
+.check-text { display: flex; flex-direction: column; gap: 2px; }
+.check-title { font-size: 11.5px; color: #fff; font-weight: 500; }
+.check-sub { font-size: 10.5px; color: var(--text-muted); line-height: 1.35; }
+.modal-footer {
+  padding: 14px 20px 18px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  gap: 10px;
+}
+.btn-cancel {
+  flex: 1;
+  height: 38px;
+  background: #161a1e;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-cancel:hover { background: #1f252c; color: #fff; }
+.btn-confirm {
+  flex: 2;
+  height: 38px;
+  background: #171b1f;
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  border-radius: 6px;
+  color: var(--green-accent);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-confirm:hover { background: #1f262b; border-color: var(--green); color: #fff; }
+.btn-confirm:active { transform: scale(0.99); }
+
+/* Toast 提示 */
+.toast-msg {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: #14181c;
+  border: 1px solid var(--border-strong);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-icon { width: 14px; height: 14px; color: var(--green-accent); }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 顶部导航栏：仅 跟单广场 | 市场行情 | 合约交易，右侧纯平铺无嵌套 box -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a class="brand" href="square.html">
+        <div class="brand-logo-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.2L18.8 8 12 11.8 5.2 8 12 4.2zM5 9.8l6 3.3v7.1l-6-3.3V9.8zm8 10.4v-7.1l6-3.3v7.1l-6 3.3z"/></svg>
+        </div>
+        <span class="brand-word">SMART<b>LIQUID</b></span>
+      </a>
+      <nav class="platform-nav">
+        <a href="square.html" class="platform-link" title="全网交易员筛选与跟单">跟单广场</a>
+        <a href="javascript:void(0)" class="platform-link" onclick="showToast('这期不做')">市场行情</a>
+        <a href="javascript:void(0)" class="platform-link" onclick="showToast('这期不做')">合约交易</a>
+      </nav>
+    </div>
+
+    <!-- 右侧功能元素：平铺排列，不设外层包裹 box -->
+    <div class="topbar-right">
+      <!-- 1. 我的跟单 -->
+      <a href="copytrade.html" class="nav-btn-copy" title="查看我当前正在运行的跟单策略">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <span>我的跟单</span>
+        <span class="nav-copy-badge">2</span>
+      </a>
+
+      <!-- 2. 通知铃铛 -->
+      <div class="notice-wrap">
+        <button class="nav-icon-btn" id="notice-btn" title="消息与成交通知">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span class="unread-dot" id="notice-dot"></span>
+        </button>
+
+        <div class="dropdown-menu" id="notice-dropdown">
+          <div class="dropdown-header">
+            <span>个人交易通知</span>
+            <span class="dropdown-clear" id="notice-clear">全部已读</span>
+          </div>
+          <div class="notice-item">
+            <div class="notice-icon">✓</div>
+            <div>
+              <div class="notice-title">跟单开仓成功</div>
+              <div class="notice-desc">跟随 0x456f 同步建立 HYPE 多头仓位，开仓价 $37.46</div>
+              <div class="notice-time">10分钟前</div>
+            </div>
+          </div>
+          <div class="notice-item">
+            <div class="notice-icon" style="background:rgba(227,179,65,0.1);color:#e3b341;border-color:rgba(227,179,65,0.25)">$</div>
+            <div>
+              <div class="notice-title">已收取资金费</div>
+              <div class="notice-desc">SOL 空头仓位结算资金费 +$34.12 USDC</div>
+              <div class="notice-time">2小时前</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. 钱包头像与地址 -->
+      <div class="wallet-wrap">
+        <div class="nav-wallet-btn" id="wallet-btn">
+          <div class="avatar-jazz">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+          </div>
+          <span class="wallet-addr">0x89C...3D4e</span>
+          <span class="wallet-balance">12,450 USDC</span>
+          <svg class="wallet-down-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+
+        <div class="wallet-dropdown" id="wallet-dropdown">
+          <!-- 顶部资产与网络 -->
+          <div class="wallet-dd-header">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:10px;color:var(--text-muted)">当前网络: Arbitrum One</span>
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:14px;color:#fff;font-weight:700;margin-top:3px">12,450.00 USDC</div>
+          </div>
+
+          <!-- 语言切换 (明显独立行) -->
+          <div class="wallet-dd-item" style="cursor:default">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>系统语言</span>
+            </div>
+            <div class="lang-switch-pills">
+              <span class="lang-pill active" onclick="switchLang('zh')">中文</span>
+              <span class="lang-pill" onclick="switchLang('en')">EN</span>
+            </div>
+          </div>
+
+          <!-- 我的邀请 (跳转独立邀请页面) -->
+          <a class="wallet-dd-item" id="wallet-dd-invite" href="invite.html">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7.5" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+              <span>我的邀请中心</span>
+            </div>
+            <span class="invite-reward-badge">返佣 20%</span>
+          </a>
+
+          <!-- 前往我的跟单 -->
+          <a class="wallet-dd-item" href="copytrade.html">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>我的跟单投资组合</span>
+            </div>
+            <span style="font-size:11px;color:var(--text-muted)">→</span>
+          </a>
+
+          <div class="wallet-dd-divider"></div>
+
+          <!-- 复制地址 -->
+          <div class="wallet-dd-item" id="wallet-dd-copy">
+            <div class="wallet-dd-left">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>复制钱包地址</span>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted)">0x89C...3D4e</span>
+          </div>
+
+          <!-- 断开连接 -->
+          <div class="wallet-dd-item" style="color:#ff757e" id="wallet-dd-disconnect">
+            <div class="wallet-dd-left">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>断开钱包连接</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 钱包地址与状态行 -->
+  <div class="wallet-row">
+    <div class="wallet-left">
+      <a href="square.html" class="back-link" title="返回跟单广场">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        跟单广场
+      </a>
+      <span class="wallet-tag">/ 当前钱包：</span>
+      <span class="wallet-address" id="addr">0x456f89aa8d7c4380a80d25df80fa0ed88f3b01ac</span>
+      <button class="tiny-btn" id="copy">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <span id="copy-text">复制</span>
+      </button>
+      <span style="color:var(--border-subtle)">|</span>
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        <span>实时快照正常</span>
+      </div>
+    </div>
+    <div>
+      <button class="tiny-btn" id="fav">
+        <span id="fav-icon">☆</span> 收藏
+      </button>
+    </div>
+  </div>
+
+  <!-- 主体网格：左概览 + 右图表 -->
+  <div class="main-grid">
+    <!-- 左侧总结卡片 -->
+    <section class="card summary">
+      <div class="sum-sec">
+        <div class="sum-head">
+          <div>
+            <div class="equity">$79,485.59</div>
+            <div class="label">总资产估值</div>
+          </div>
+          <div class="cohort">
+            <strong>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              聪明资金
+            </strong>
+            历史永续盈利<br>$100K – $1M
+          </div>
+        </div>
+        <div class="alloc">
+          <span class="perp">合约 88%</span>
+          <span class="spot">现货 12%</span>
+        </div>
+      </div>
+
+      <div class="profile-row">
+        <div class="profile-card">
+          <span class="info" title="根据近期多空仓位头寸规模与开平仓方向计算">i</span>
+          <div>
+            <div class="bias-big">非常偏多 ↗↗</div>
+            <div class="bias-sub">合约偏差</div>
+          </div>
+        </div>
+        <div class="profile-card">
+          <span class="info" title="当前总持仓名义价值与净资产杠杆比例">i</span>
+          <div>
+            <div class="gauge-wrap">
+              <svg class="gauge-svg" viewBox="0 0 100 50">
+                <path d="M 12 45 A 38 38 0 0 1 88 45" fill="none" stroke="#222830" stroke-width="6" stroke-linecap="round"/>
+                <path d="M 12 45 A 38 38 0 0 1 76 21" fill="none" stroke="url(#gauge-grad)" stroke-width="6" stroke-linecap="round"/>
+                <defs>
+                  <linearGradient id="gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#2ecc71"/>
+                    <stop offset="80%" stop-color="#3dd68c"/>
+                    <stop offset="100%" stop-color="#e3b341"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="75" cy="22" r="3" fill="#ffffff" stroke="#15181b" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="gauge-num">8.02x</div>
+            <div class="gauge-lab">当前杠杆率</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="switchline">
+          <span class="pill on">合约</span>
+          <span class="pill">总体</span>
+        </div>
+        <div class="periods">
+          <span class="pill">24小时</span>
+          <span class="pill">7天</span>
+          <span class="pill on">30天</span>
+          <span class="pill">全部</span>
+        </div>
+      </div>
+
+      <div class="data-row">
+        <div class="data-title">盈亏（30天）</div>
+        <div class="data-value neg">-15.44%</div>
+        <svg class="spark" viewBox="0 0 120 24" preserveAspectRatio="none">
+          <path d="M2 8 L18 10 L28 11 L34 4 L40 9 L48 10 L55 17 L65 18 L77 18 L88 17 L95 18 L104 16 L112 17 L118 13" fill="none" stroke="#f85149" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="amount neg">-$16,891.96</div>
+      </div>
+
+      <div class="volume-row">
+        <span class="data-title">交易量（30天）</span>
+        <span class="v">$11,387,911.66</span>
+      </div>
+
+      <div class="mini-strip">
+        <div class="mini">
+          <span>最大回撤</span>
+          <b style="color:var(--red)">38.2%</b>
+        </div>
+        <div class="mini">
+          <span>胜率</span>
+          <b style="color:var(--green-accent)">66.7%</b>
+        </div>
+        <div class="mini">
+          <span>中位持仓</span>
+          <b>8d 16h</b>
+        </div>
+      </div>
+
+      <button class="copytrade" id="copytrade">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+        一键跟单该交易员
+      </button>
+      <div class="copyhint">非托管智能合约 · 支持止损保护</div>
+    </section>
+
+    <!-- 右侧图表面板 -->
+    <section class="card chart">
+      <div class="chart-head">
+        <div class="tools">
+          <div class="tool-group">
+            <span class="tool on">全部</span>
+            <span class="tool">合约</span>
+          </div>
+          <div class="tool-group">
+            <span class="tool on">资产</span>
+            <span class="tool">PNL</span>
+          </div>
+          <div class="tool-group">
+            <span class="tool">24H</span>
+            <span class="tool">7D</span>
+            <span class="tool">30D</span>
+            <span class="tool on">全部</span>
+          </div>
+        </div>
+        <div class="chart-title">
+          组合资产（全部历史）
+          <strong>$79,485.59</strong>
+        </div>
+      </div>
+
+      <div class="chart-area">
+        <div class="watermark">SMARTLIQUID</div>
+        <svg viewBox="0 0 860 330" preserveAspectRatio="none" aria-label="资产曲线">
+          <defs>
+            <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#2ecc71" stop-opacity="0.10"/>
+              <stop offset="60%" stop-color="#2ecc71" stop-opacity="0.02"/>
+              <stop offset="100%" stop-color="#2ecc71" stop-opacity="0.0"/>
+            </linearGradient>
+          </defs>
+
+          <line class="grid" x1="50" y1="35" x2="840" y2="35"/>
+          <line class="grid" x1="50" y1="90" x2="840" y2="90"/>
+          <line class="grid" x1="50" y1="145" x2="840" y2="145"/>
+          <line class="grid" x1="50" y1="200" x2="840" y2="200"/>
+          <line class="grid" x1="50" y1="255" x2="840" y2="255"/>
+
+          <text class="axis" x="6" y="39">$100K</text>
+          <text class="axis" x="12" y="94">$85K</text>
+          <text class="axis" x="12" y="149">$70K</text>
+          <text class="axis" x="12" y="204">$55K</text>
+          <text class="axis" x="12" y="259">$40K</text>
+
+          <path class="step" d="M50 250 H170 V210 H330 V173 H520 V135 H705 V80 H840"/>
+          <path class="area" d="M50 273 C75 220,90 190,120 181 C155 170,168 130,205 142 C245 154,260 192,300 173 C342 154,380 145,415 128 C460 106,495 82,530 60 C568 36,605 55,640 63 C675 71,695 88,720 76 C745 64,755 28,770 53 C790 87,805 100,820 112 C830 120,835 122,840 126 L840 280 L50 280 Z"/>
+          <path class="line" d="M50 273 C75 220,90 190,120 181 C155 170,168 130,205 142 C245 154,260 192,300 173 C342 154,380 145,415 128 C460 106,495 82,530 60 C568 36,605 55,640 63 C675 71,695 88,720 76 C745 64,755 28,770 53 C790 87,805 100,820 112 C830 120,835 122,840 126"/>
+
+          <line class="chart-tooltip-guide" x1="840" y1="35" x2="840" y2="280"/>
+          <circle class="dot" cx="840" cy="126" r="4"/>
+
+          <text class="axis" x="50" y="305">01/Feb</text>
+          <text class="axis" x="200" y="305">01/Mar</text>
+          <text class="axis" x="360" y="305">01/Apr</text>
+          <text class="axis" x="520" y="305">01/May</text>
+          <text class="axis" x="675" y="305">01/Jun</text>
+          <text class="axis" x="805" y="305">01/Jul</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+
+  <!-- 底部数据表格卡片 -->
+  <section class="card table-wrap">
+    <div class="tabs">
+      <button class="tab" data-tab="tab-perps">合约 (2)</button>
+      <button class="tab" data-tab="tab-results">结果 (0)</button>
+      <button class="tab" data-tab="tab-assets">资产 (1)</button>
+      <button class="tab active" data-tab="tab-closed">已关闭交易</button>
+      <button class="tab" data-tab="tab-orders">未完成订单</button>
+      <button class="tab" data-tab="tab-fills">成交记录</button>
+      <button class="tab" data-tab="tab-more">更多</button>
+      <div class="table-meta">累计已结盈亏：<b class="pos">+$223,730.00</b></div>
+    </div>
+
+    <!-- 1. 合约面板 (当前活动持仓) -->
+    <div id="tab-perps" class="panel hidden">
+      <table>
+        <thead class="thead">
+          <tr>
+            <th>合约 / 杠杆</th>
+            <th class="num">持仓数量</th>
+            <th class="num">名义价值</th>
+            <th class="num">开仓均价</th>
+            <th class="num">最新标记价</th>
+            <th class="num">浮动盈亏 / ROE</th>
+            <th class="num">累计已结资金费</th>
+            <th class="num">距强平线</th>
+            <th class="num">持仓时长</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <a href="token.html" class="coin" style="text-decoration:none" title="点击查看 SOPH/SOL 币种深度分析与清算地图">
+                <span class="coinico">SOL</span>
+                <div>
+                  <div class="coin-name">SOL <span class="badge-tag badge-short">20x 空</span></div>
+                  <span class="sub">全仓保证金 · 查看币种画像 →</span>
+                </div>
+              </a>
+            </td>
+            <td class="num neg">-62,426.22</td>
+            <td class="num">$10.23M</td>
+            <td class="num">$161.509</td>
+            <td class="num">$163.830</td>
+            <td class="num neg">
+              -$144,890.81
+              <span class="sub neg">-13.77%</span>
+            </td>
+            <td class="num pos">+$311,655.39</td>
+            <td class="num">
+              <div class="liq-wrapper">
+                <span style="color:var(--red);font-weight:600">6.0%</span>
+                <div class="liqbar"><i style="width:24%;background:var(--red)"></i></div>
+              </div>
+            </td>
+            <td class="num" style="color:var(--text-dim)">67天 14h</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="token.html" class="coin" style="text-decoration:none" title="点击查看 HYPE 币种深度分析与清算地图">
+                <span class="coinico">H</span>
+                <div>
+                  <div class="coin-name">HYPE <span class="badge-tag badge-long">10x 多</span></div>
+                  <span class="sub">全仓保证金 · 查看币种画像 →</span>
+                </div>
+              </a>
+            </td>
+            <td class="num pos">+234,344.42</td>
+            <td class="num">$8.78M</td>
+            <td class="num">$33.1156</td>
+            <td class="num">$37.4610</td>
+            <td class="num pos">
+              +$1,018,314.79
+              <span class="sub pos">+31.42%</span>
+            </td>
+            <td class="num neg">-$403,048.60</td>
+            <td class="num">
+              <div class="liq-wrapper">
+                <span style="color:var(--green-accent);font-weight:600">安全</span>
+                <div class="liqbar"><i style="width:4%;background:var(--green)"></i></div>
+              </div>
+            </td>
+            <td class="num" style="color:var(--text-dim)">67天 14h</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 结果 (0) 空面板 -->
+    <div id="tab-results" class="panel hidden empty-panel">当前统计周期内暂无结算异常或仲裁结果</div>
+
+    <!-- 2. 资产面板 (钱包各代币余额与保证金估值) -->
+    <div id="tab-assets" class="panel hidden">
+      <table>
+        <thead class="thead">
+          <tr>
+            <th>资产币种</th>
+            <th class="num">总持有量</th>
+            <th class="num">可用余额</th>
+            <th class="num">已占用保证金</th>
+            <th class="num">当前单价</th>
+            <th class="num">折合总价值 (USD)</th>
+            <th class="num">钱包资产占比</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="coin">
+                <span class="coinico" style="background:#16231a;color:var(--green-accent);border-color:rgba(46,204,113,0.3)">U</span>
+                <div>
+                  <div class="coin-name">USDC <span class="sub">USD Coin</span></div>
+                </div>
+              </div>
+            </td>
+            <td class="num" style="font-weight:700;color:#fff">11,245,820.50</td>
+            <td class="num">9,344,010.20</td>
+            <td class="num" style="color:var(--orange)">1,901,810.30</td>
+            <td class="num">$1.000</td>
+            <td class="num pos" style="font-weight:700">$11,245,820.50</td>
+            <td class="num">59.1%</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="coin">
+                <span class="coinico" style="background:#151c27;color:#60a5fa;border-color:rgba(96,165,250,0.3)">ETH</span>
+                <div>
+                  <div class="coin-name">ETH <span class="sub">Ethereum</span></div>
+                </div>
+              </div>
+            </td>
+            <td class="num" style="font-weight:700;color:#fff">1,820.40</td>
+            <td class="num">1,820.40</td>
+            <td class="num" style="color:var(--text-muted)">0.00</td>
+            <td class="num">$2,680.50</td>
+            <td class="num pos" style="font-weight:700">$4,879,582.20</td>
+            <td class="num">25.6%</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="coin">
+                <span class="coinico" style="background:#20192e;color:#a78bfa;border-color:rgba(167,139,250,0.3)">SOL</span>
+                <div>
+                  <div class="coin-name">SOL <span class="sub">Solana</span></div>
+                </div>
+              </div>
+            </td>
+            <td class="num" style="font-weight:700;color:#fff">12,500.00</td>
+            <td class="num">12,500.00</td>
+            <td class="num" style="color:var(--text-muted)">0.00</td>
+            <td class="num">$163.83</td>
+            <td class="num pos" style="font-weight:700">$2,047,875.00</td>
+            <td class="num">10.8%</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="coin">
+                <span class="coinico" style="background:#241f15;color:#e5be79;border-color:rgba(229,190,121,0.3)">H</span>
+                <div>
+                  <div class="coin-name">HYPE <span class="sub">Hyperliquid</span></div>
+                </div>
+              </div>
+            </td>
+            <td class="num" style="font-weight:700;color:#fff">22,500.00</td>
+            <td class="num">22,500.00</td>
+            <td class="num" style="color:var(--text-muted)">0.00</td>
+            <td class="num">$37.46</td>
+            <td class="num pos" style="font-weight:700">$842,850.00</td>
+            <td class="num">4.5%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. 已关闭交易 - 深度历史交易复盘页面 (4层完备架构) -->
+    <div id="tab-closed" class="panel">
+      <!-- 第 2 层：已关闭交易汇总统计栏 -->
+      <div class="closed-summary-bar">
+        <div class="closed-summary-left">
+          <div class="period-select-wrap">
+            <button class="period-select-btn" id="closed-period-btn" onclick="toggleClosedPeriod()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span id="closed-period-label">全部时间</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+          </div>
+
+          <div class="summary-stat-group">
+            <div class="summary-stat-item">
+              <span class="summary-stat-label">交易总数</span>
+              <span class="summary-stat-val">29</span>
+            </div>
+            <div style="width:1px;height:24px;background:var(--border-subtle)"></div>
+            <div class="summary-stat-item">
+              <span class="summary-stat-label">历史胜率</span>
+              <span class="summary-stat-val pos">31%</span>
+            </div>
+            <div style="width:1px;height:24px;background:var(--border-subtle)"></div>
+            <div class="summary-stat-item">
+              <span class="summary-stat-label">平均持仓时间</span>
+              <span class="summary-stat-val">1d 2h 36m</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="closed-summary-right">
+          <span class="ratio-title">多 / 空比例</span>
+          <div class="ratio-track-wrap">
+            <div class="ratio-label-row">
+              <span style="color:var(--green-accent)">多 65% (19)</span>
+              <span style="color:var(--red)">空 35% (10)</span>
+            </div>
+            <div class="ratio-bar-strip">
+              <div class="ratio-seg-long" style="width:65.5%"></div>
+              <div class="ratio-seg-short" style="width:34.5%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 第 3 层：每笔完整交易聚合列表 -->
+      <table>
+        <thead class="thead">
+          <tr>
+            <th style="width:40px;text-align:center">展开</th>
+            <th>代币</th>
+            <th>方向</th>
+            <th class="num">仓位大小</th>
+            <th class="num">平均进场价</th>
+            <th class="num">持仓时间</th>
+            <th class="num">平均平仓价</th>
+            <th class="num">已实现 PNL</th>
+            <th class="num">成交记录</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 交易 1 (STRC，默认展开展示第4层完整复盘) -->
+          <tr class="tr-clickable expanded" onclick="toggleReplay('strc', this)">
+            <td style="text-align:center">
+              <div class="expand-toggle-btn">▶</div>
+            </td>
+            <td>
+              <div class="coin">
+                <span class="coinico" style="background:#18231c;color:var(--green-accent);border-color:rgba(46,204,113,0.3)">ST</span>
+                <div>
+                  <div class="coin-name">STRC <span class="sub">StarCoin Perp</span></div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-tag badge-long">Long</span></td>
+            <td class="num pos">
+              +13,692.8
+              <span class="sub" style="color:var(--text-dim)">$1,065,004.78</span>
+            </td>
+            <td class="num">
+              $77.778
+              <span class="sub" style="color:var(--text-muted)">04/18 09:12:00</span>
+            </td>
+            <td class="num" style="font-weight:600;color:#fff">25d 5h 17m</td>
+            <td class="num">
+              $87.489
+              <span class="sub" style="color:var(--text-muted)">05/13 14:29:17</span>
+            </td>
+            <td class="num pos" style="font-weight:700">
+              +$127,772.89
+              <span class="sub pos">+12.48% (ROE)</span>
+            </td>
+            <td class="num" style="font-weight:700;color:var(--green-accent)">1037 次</td>
+          </tr>
+
+          <!-- 第 4 层：展开后的 STRC 单笔交易深度复盘抽屉 -->
+          <tr id="drawer-strc" class="replay-drawer-row">
+            <td colspan="9">
+              <div class="replay-content-box">
+                <!-- 抽屉顶部子导航：图表摘要 / Fills -->
+                <div class="drawer-subnav">
+                  <div class="drawer-subtabs">
+                    <button class="drawer-subtab-btn active" onclick="switchDrawerTab(event, 'strc', 'summary')">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:3px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                      图表摘要
+                    </button>
+                    <button class="drawer-subtab-btn" onclick="switchDrawerTab(event, 'strc', 'fills')">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:3px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                      Fills (1037 笔成交)
+                    </button>
+                  </div>
+
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <button class="drawer-timeframe-btn" onclick="showToast('已切换为 12h K线聚合周期')">
+                      <span>12h 时间范围</span>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 视图 A: 图表摘要 (K线交易全过程 + MFE/MAE + 费用 + 区间表现 + 质量评估 + 自动分析) -->
+                <div id="strc-view-summary" class="replay-grid">
+                  <!-- 左侧：K线交易过程全貌图 -->
+                  <div class="replay-chart-card">
+                    <div class="chart-card-head">
+                      <div class="chart-title-wrap">
+                        <span>STRC/USDC 交易生命周期全貌</span>
+                        <span style="font-size:10.5px;color:var(--text-muted);font-weight:400">(共聚合 1037 次分批买入与止盈)</span>
+                      </div>
+                      <div class="chart-legend">
+                        <div class="chart-legend-item">
+                          <span class="dot-indicator" style="background:#2ecc71"></span>
+                          <span>Open / 加仓点</span>
+                        </div>
+                        <div class="chart-legend-item">
+                          <span class="dot-indicator" style="background:#e3b341"></span>
+                          <span>Close / 减仓点</span>
+                        </div>
+                        <div class="chart-legend-item">
+                          <span class="dot-indicator" style="background:rgba(46,204,113,0.35);border:1px solid #2ecc71"></span>
+                          <span>MFE 峰值</span>
+                        </div>
+                        <div class="chart-legend-item">
+                          <span class="dot-indicator" style="background:var(--red)"></span>
+                          <span>MAE 谷值</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- SVG 专业走势图表 -->
+                    <div class="replay-svg-wrap">
+                      <svg viewBox="0 0 680 270" preserveAspectRatio="none">
+                        <defs>
+                          <linearGradient id="strcGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#2ecc71" stop-opacity="0.25"/>
+                            <stop offset="70%" stop-color="#2ecc71" stop-opacity="0.03"/>
+                            <stop offset="100%" stop-color="#2ecc71" stop-opacity="0.0"/>
+                          </linearGradient>
+                          <pattern id="gridPattern" width="68" height="45" patternUnits="userSpaceOnUse">
+                            <path d="M 68 0 L 0 0 0 45" fill="none" stroke="#171b20" stroke-width="0.8"/>
+                          </pattern>
+                        </defs>
+
+                        <!-- 背景网格 -->
+                        <rect width="680" height="230" fill="url(#gridPattern)" />
+
+                        <!-- 水平参考虚线 -->
+                        <line x1="40" y1="35" x2="670" y2="35" stroke="#1f242a" stroke-dasharray="3,3"/>
+                        <line x1="40" y1="85" x2="670" y2="85" stroke="#1f242a" stroke-dasharray="3,3"/>
+                        <line x1="40" y1="135" x2="670" y2="135" stroke="#1f242a" stroke-dasharray="3,3"/>
+                        <line x1="40" y1="185" x2="670" y2="185" stroke="#1f242a" stroke-dasharray="3,3"/>
+                        <line x1="40" y1="230" x2="670" y2="230" stroke="#252b33"/>
+
+                        <!-- 左侧 Y 轴价格 -->
+                        <text x="5" y="39" fill="#57606a" font-size="9.5" font-family="JetBrains Mono">$95.00</text>
+                        <text x="5" y="89" fill="#57606a" font-size="9.5" font-family="JetBrains Mono">$90.00</text>
+                        <text x="5" y="139" fill="#57606a" font-size="9.5" font-family="JetBrains Mono">$85.00</text>
+                        <text x="5" y="189" fill="#57606a" font-size="9.5" font-family="JetBrains Mono">$80.00</text>
+                        <text x="5" y="233" fill="#57606a" font-size="9.5" font-family="JetBrains Mono">$75.00</text>
+
+                        <!-- MAE 水平参考带与标注线 (-0.67%, $77.26) -->
+                        <line x1="60" y1="211" x2="280" y2="211" stroke="#f85149" stroke-width="1.2" stroke-dasharray="2,2"/>
+                        <rect x="180" y="202" width="112" height="18" rx="3" fill="#241315" stroke="#f85149" stroke-width="0.8"/>
+                        <text x="186" y="215" fill="#f85149" font-size="9.5" font-family="JetBrains Mono" font-weight="700">MAE $77.26 (-0.67%)</text>
+
+                        <!-- MFE 水平参考带与标注线 (+18.35%, $92.05) -->
+                        <line x1="120" y1="58" x2="520" y2="58" stroke="#3dd68c" stroke-width="1.2" stroke-dasharray="2,2"/>
+                        <rect x="360" y="49" width="118" height="18" rx="3" fill="#132418" stroke="#3dd68c" stroke-width="0.8"/>
+                        <text x="366" y="62" fill="#3dd68c" font-size="9.5" font-family="JetBrains Mono" font-weight="700">MFE $92.05 (+18.35%)</text>
+
+                        <!-- 价格波动填充区域与走势主折线 -->
+                        <path d="M 60 206 C 90 211, 120 180, 160 165 C 200 150, 240 170, 290 120 C 340 70, 400 58, 430 58 C 470 58, 520 85, 560 100 C 600 115, 620 105, 640 107 L 640 230 L 60 230 Z" fill="url(#strcGradient)"/>
+                        <path d="M 60 206 C 90 211, 120 180, 160 165 C 200 150, 240 170, 290 120 C 340 70, 400 58, 430 58 C 470 58, 520 85, 560 100 C 600 115, 620 105, 640 107" fill="none" stroke="#2ecc71" stroke-width="2.2" stroke-linecap="round"/>
+
+                        <!-- Open 进场点标注 (04/18, $77.78) -->
+                        <circle cx="60" cy="206" r="5" fill="#2ecc71" stroke="#0d0f12" stroke-width="2"/>
+                        <line x1="60" y1="206" x2="60" y2="160" stroke="#2ecc71" stroke-width="1"/>
+                        <rect x="30" y="142" width="76" height="18" rx="3" fill="#152418" stroke="#2ecc71" stroke-width="0.8"/>
+                        <text x="36" y="155" fill="#3dd68c" font-size="9" font-family="JetBrains Mono" font-weight="700">Open $77.78</text>
+
+                        <!-- 加仓点标记 (微型圆点) -->
+                        <circle cx="110" cy="188" r="3" fill="#3dd68c" opacity="0.9"/>
+                        <circle cx="160" cy="165" r="3" fill="#3dd68c" opacity="0.9"/>
+                        <circle cx="210" cy="155" r="3" fill="#3dd68c" opacity="0.9"/>
+                        <circle cx="270" cy="132" r="3" fill="#3dd68c" opacity="0.9"/>
+
+                        <!-- MFE 峰值最高点 -->
+                        <circle cx="430" cy="58" r="5" fill="#3dd68c" stroke="#fff" stroke-width="1.5"/>
+
+                        <!-- 分批减仓点 -->
+                        <circle cx="510" cy="80" r="3" fill="#e3b341" opacity="0.9"/>
+                        <circle cx="570" cy="103" r="3" fill="#e3b341" opacity="0.9"/>
+
+                        <!-- Close 平仓点标注 (05/13, $87.49) -->
+                        <circle cx="640" cy="107" r="5" fill="#e3b341" stroke="#0d0f12" stroke-width="2"/>
+                        <line x1="640" y1="107" x2="640" y2="60" stroke="#e3b341" stroke-width="1"/>
+                        <rect x="592" y="42" width="82" height="18" rx="3" fill="#242115" stroke="#e3b341" stroke-width="0.8"/>
+                        <text x="597" y="55" fill="#e3b341" font-size="9" font-family="JetBrains Mono" font-weight="700">Close $87.49</text>
+
+                        <!-- X 轴日期 -->
+                        <text x="50" y="248" fill="#57606a" font-size="9" font-family="JetBrains Mono">04/18 (开仓)</text>
+                        <text x="180" y="248" fill="#57606a" font-size="9" font-family="JetBrains Mono">04/25</text>
+                        <text x="320" y="248" fill="#57606a" font-size="9" font-family="JetBrains Mono">05/02</text>
+                        <text x="470" y="248" fill="#57606a" font-size="9" font-family="JetBrains Mono">05/09</text>
+                        <text x="590" y="248" fill="#57606a" font-size="9" font-family="JetBrains Mono">05/13 (平仓)</text>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <!-- 右侧：深度复盘分析面板 -->
+                  <div class="replay-metrics-card">
+                    <!-- 1. 费用数据 -->
+                    <div class="metrics-fee-box">
+                      <div class="fee-col">
+                        <span class="fee-col-label">资金费率累计支出</span>
+                        <span class="fee-col-val neg">-$4,530.93</span>
+                      </div>
+                      <div style="width:1px;height:24px;background:var(--border-subtle)"></div>
+                      <div class="fee-col">
+                        <span class="fee-col-label">交易手续费 (Maker/Taker)</span>
+                        <span class="fee-col-val" style="color:var(--text-dim)">$673.04</span>
+                      </div>
+                      <div style="width:1px;height:24px;background:var(--border-subtle)"></div>
+                      <div class="fee-col">
+                        <span class="fee-col-label">持仓综合费用占比</span>
+                        <span class="fee-col-val" style="color:var(--orange)">3.91%</span>
+                      </div>
+                    </div>
+
+                    <!-- 2. 交易区间表现标尺 (从 MAE -0.67% 到 MFE +18.35%) -->
+                    <div class="metrics-range-box">
+                      <div class="range-head-row">
+                        <span>交易全生命周期价格区间表现</span>
+                        <span style="font-family:var(--font-mono);font-size:11px;color:var(--green-accent)">最终收益 +12.48%</span>
+                      </div>
+
+                      <div class="range-rule-track">
+                        <!-- 不利区域 (红) -->
+                        <div class="range-seg-adverse"></div>
+                        <!-- 有利区域 (绿) -->
+                        <div class="range-seg-favorable"></div>
+
+                        <!-- 入场点标记 -->
+                        <div class="range-pin-entry">
+                          <span>入场 $77.78</span>
+                          <i></i>
+                        </div>
+
+                        <!-- 平仓点标记 -->
+                        <div class="range-pin-exit">
+                          <span>平均平仓 $87.49</span>
+                          <i></i>
+                        </div>
+                      </div>
+
+                      <div class="range-scale-labels">
+                        <span style="color:var(--red)">MAE -0.67% ($77.26)</span>
+                        <span style="color:var(--text-muted)">基准 0.00%</span>
+                        <span style="color:var(--green-accent)">MFE +18.35% ($92.05)</span>
+                      </div>
+                    </div>
+
+                    <!-- 3. 三大核心量化评估卡片 -->
+                    <div class="metrics-eval-grid">
+                      <div class="eval-card">
+                        <span class="eval-card-label">浮亏时间占比</span>
+                        <span class="eval-card-num pos">0%</span>
+                        <span class="eval-card-grade pos">极佳 · 全程盈利</span>
+                      </div>
+                      <div class="eval-card">
+                        <span class="eval-card-label">入场质量评估</span>
+                        <span class="eval-card-num pos">96%</span>
+                        <span class="eval-card-grade pos">Excellent · 启动点</span>
+                      </div>
+                      <div class="eval-card">
+                        <span class="eval-card-label">行情机会捕获</span>
+                        <span class="eval-card-num" style="color:#60a5fa">68%</span>
+                        <span class="eval-card-grade" style="color:#60a5fa">Good · 吃到中段</span>
+                      </div>
+                    </div>
+
+                    <!-- 4. 自动分析文字结论 -->
+                    <div class="metrics-analysis-narrative">
+                      <div>
+                        <b>量化复盘结论：</b>
+                        价格在入场下方仅经历了该笔交易的 <b>0%</b>，在 <b>18.35%</b> 的有利波动下，最大逆向回撤仅达到 <b>0.67%</b>。
+                      </div>
+                      <div>
+                        退出捕获了 <b>68%</b> 的有利波动。该交易员在突破关键阻力位的第一根放量阳线精准进场，持仓 25 天几乎未承担心理压力；在中后段 $87.49 处分批了结 100 万美元头寸，成功规避了顶部急跌，执行极具纪律性。
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 视图 B: Fills 详细撮合成交流水 (默认隐藏，点击切换) -->
+                <div id="strc-view-fills" class="drawer-fills-panel" style="display:none">
+                  <table>
+                    <thead class="thead">
+                      <tr>
+                        <th>撮合时间</th>
+                        <th>成交类型</th>
+                        <th>方向</th>
+                        <th class="num">成交价格</th>
+                        <th class="num">成交数量</th>
+                        <th class="num">成交金额 (USDC)</th>
+                        <th>角色</th>
+                        <th class="num">手续费</th>
+                        <th class="num">累计成交进度</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="color:var(--text-muted)">05/13 14:29:17</td>
+                        <td><span style="color:#fff;font-weight:600">最终平仓 (Close)</span></td>
+                        <td><span class="badge-tag badge-short">卖出平多</span></td>
+                        <td class="num" style="color:#fff;font-weight:700">$87.489</td>
+                        <td class="num">3,692.80</td>
+                        <td class="num">$323,079.38</td>
+                        <td><span style="color:var(--green-accent)">Maker</span></td>
+                        <td class="num pos">-$6.46</td>
+                        <td class="num" style="color:var(--green-accent)">100.0% (完全退出)</td>
+                      </tr>
+                      <tr>
+                        <td style="color:var(--text-muted)">05/11 08:14:02</td>
+                        <td><span>分批止盈 (Take Profit)</span></td>
+                        <td><span class="badge-tag badge-short">卖出平多</span></td>
+                        <td class="num">$88.200</td>
+                        <td class="num">4,000.00</td>
+                        <td class="num">$352,800.00</td>
+                        <td><span>Taker</span></td>
+                        <td class="num">$52.92</td>
+                        <td class="num">73.0%</td>
+                      </tr>
+                      <tr>
+                        <td style="color:var(--text-muted)">05/02 18:30:45</td>
+                        <td><span>高位锁利 (Partial Close)</span></td>
+                        <td><span class="badge-tag badge-short">卖出平多</span></td>
+                        <td class="num">$91.800</td>
+                        <td class="num">2,000.00</td>
+                        <td class="num">$183,600.00</td>
+                        <td><span style="color:var(--green-accent)">Maker</span></td>
+                        <td class="num pos">-$3.67</td>
+                        <td class="num">43.8%</td>
+                      </tr>
+                      <tr>
+                        <td style="color:var(--text-muted)">04/22 11:05:10</td>
+                        <td><span>浮盈加仓 (Pyramiding)</span></td>
+                        <td><span class="badge-tag badge-long">买入加多</span></td>
+                        <td class="num">$79.500</td>
+                        <td class="num">4,000.00</td>
+                        <td class="num">$318,000.00</td>
+                        <td><span>Taker</span></td>
+                        <td class="num">$47.70</td>
+                        <td class="num">持仓增至 13,692.8</td>
+                      </tr>
+                      <tr>
+                        <td style="color:var(--text-muted)">04/18 09:12:00</td>
+                        <td><span style="color:var(--green-accent);font-weight:600">初始开仓 (Open)</span></td>
+                        <td><span class="badge-tag badge-long">买入开多</span></td>
+                        <td class="num" style="color:var(--green-accent);font-weight:700">$77.050</td>
+                        <td class="num">9,692.80</td>
+                        <td class="num">$746,830.24</td>
+                        <td><span style="color:var(--green-accent)">Maker</span></td>
+                        <td class="num pos">-$14.93</td>
+                        <td class="num">首笔开仓</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style="padding:10px 16px;font-size:11px;color:var(--text-muted);background:#101316;display:flex;justify-content:space-between">
+                    <span>已展示代表性分批撮合节点（共聚合 1037 次微订单）</span>
+                    <a href="javascript:void(0)" onclick="showToast('正在导出 STRC 完整 1037 笔原始撮合 CSV...')" style="color:var(--green-accent);text-decoration:none">导出全部 1037 笔成交 CSV ↗</a>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- 交易 2 (MU) -->
+          <tr class="tr-clickable" onclick="toggleReplay('mu', this)">
+            <td style="text-align:center">
+              <div class="expand-toggle-btn">▶</div>
+            </td>
+            <td>
+              <div class="coin">
+                <span class="coinico" style="background:#151c27;color:#60a5fa;border-color:rgba(96,165,250,0.3)">MU</span>
+                <div>
+                  <div class="coin-name">MU <span class="sub">Micron Tech Perp</span></div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-tag badge-short">Short</span></td>
+            <td class="num neg">
+              -8,500.0
+              <span class="sub" style="color:var(--text-dim)">$826,200.00</span>
+            </td>
+            <td class="num">
+              $102.450
+              <span class="sub" style="color:var(--text-muted)">05/04 15:30:12</span>
+            </td>
+            <td class="num" style="font-weight:600;color:#fff">2d 14h 22m</td>
+            <td class="num">
+              $97.200
+              <span class="sub" style="color:var(--text-muted)">05/07 05:52:34</span>
+            </td>
+            <td class="num pos" style="font-weight:700">
+              +$44,625.00
+              <span class="sub pos">+5.12%</span>
+            </td>
+            <td class="num" style="font-weight:700;color:var(--green-accent)">84 次</td>
+          </tr>
+
+          <!-- 交易 3 (ETH) -->
+          <tr class="tr-clickable" onclick="toggleReplay('eth', this)">
+            <td style="text-align:center">
+              <div class="expand-toggle-btn">▶</div>
+            </td>
+            <td>
+              <div class="coin">
+                <span class="coinico" style="background:#151c27;color:#60a5fa;border-color:rgba(96,165,250,0.3)">ETH</span>
+                <div>
+                  <div class="coin-name">ETH <span class="sub">Ethereum Perp</span></div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-tag badge-long">Long</span></td>
+            <td class="num pos">
+              +420.50
+              <span class="sub" style="color:var(--text-dim)">$1,143,760.00</span>
+            </td>
+            <td class="num">
+              $2,720.00
+              <span class="sub" style="color:var(--text-muted)">05/08 20:15:00</span>
+            </td>
+            <td class="num" style="font-weight:600;color:#fff">18h 32m</td>
+            <td class="num">
+              $2,676.20
+              <span class="sub" style="color:var(--text-muted)">05/09 14:47:00</span>
+            </td>
+            <td class="num neg" style="font-weight:700">
+              -$18,417.90
+              <span class="sub neg">-1.61%</span>
+            </td>
+            <td class="num" style="font-weight:700;color:var(--green-accent)">216 次</td>
+          </tr>
+
+          <!-- 交易 4 (BRENTOIL) -->
+          <tr class="tr-clickable" onclick="toggleReplay('brent', this)">
+            <td style="text-align:center">
+              <div class="expand-toggle-btn">▶</div>
+            </td>
+            <td>
+              <div class="coin">
+                <span class="coinico" style="background:#241f15;color:#e5be79;border-color:rgba(229,190,121,0.3)">BO</span>
+                <div>
+                  <div class="coin-name">BRENTOIL <span class="sub">Brent Crude Oil Perp</span></div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-tag badge-long">Long</span></td>
+            <td class="num pos">
+              +15,000.0
+              <span class="sub" style="color:var(--text-dim)">$1,147,500.00</span>
+            </td>
+            <td class="num">
+              $74.200
+              <span class="sub" style="color:var(--text-muted)">04/24 10:00:22</span>
+            </td>
+            <td class="num" style="font-weight:600;color:#fff">6d 08h 45m</td>
+            <td class="num">
+              $78.850
+              <span class="sub" style="color:var(--text-muted)">04/30 18:45:11</span>
+            </td>
+            <td class="num pos" style="font-weight:700">
+              +$69,750.00
+              <span class="sub pos">+6.27%</span>
+            </td>
+            <td class="num" style="font-weight:700;color:var(--green-accent)">512 次</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. 未完成订单 (当前正在挂单委托) -->
+    <div id="tab-orders" class="panel hidden">
+      <table>
+        <thead class="thead">
+          <tr>
+            <th>委托时间</th>
+            <th>合约 / 方向</th>
+            <th>订单类型</th>
+            <th class="num">委托价格</th>
+            <th class="num">委托数量</th>
+            <th class="num">委托价值</th>
+            <th class="num">已成交比例</th>
+            <th class="num">触发条件 / 减仓</th>
+            <th class="num">状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--text-muted)">今天 12:45:00</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">SOL</span>
+                <span class="badge-tag badge-short">加仓空</span>
+              </div>
+            </td>
+            <td>限价限时 (GTC)</td>
+            <td class="num" style="color:var(--green-accent);font-weight:600">$166.500</td>
+            <td class="num">15,000.00</td>
+            <td class="num">$2,497,500</td>
+            <td class="num">0.0%</td>
+            <td class="num">普通开仓</td>
+            <td class="num"><span style="color:var(--orange)">挂单等待撮合</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">今天 08:30:12</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">HYPE</span>
+                <span class="badge-tag badge-short">止盈减多</span>
+              </div>
+            </td>
+            <td>止盈限价 (TP)</td>
+            <td class="num" style="color:var(--green-accent);font-weight:600">$42.000</td>
+            <td class="num">50,000.00</td>
+            <td class="num">$2,100,000</td>
+            <td class="num">0.0%</td>
+            <td class="num" style="color:var(--green-accent)">只减仓 (Reduce-Only)</td>
+            <td class="num"><span style="color:var(--orange)">条件等待触发</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">昨天 21:10:05</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">SOL</span>
+                <span class="badge-tag badge-long">止损平空</span>
+              </div>
+            </td>
+            <td>止损市价 (SL)</td>
+            <td class="num" style="color:var(--red);font-weight:600">$172.000</td>
+            <td class="num">62,426.22</td>
+            <td class="num">$10,737,309</td>
+            <td class="num">0.0%</td>
+            <td class="num" style="color:var(--red)">标记价 ≥ $172 强平止损</td>
+            <td class="num"><span style="color:var(--orange)">条件等待触发</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. 成交记录 (历史真实撮合账单流水) -->
+    <div id="tab-fills" class="panel hidden">
+      <table>
+        <thead class="thead">
+          <tr>
+            <th>成交时间</th>
+            <th>合约标的 / 操作</th>
+            <th>角色 (Maker/Taker)</th>
+            <th class="num">成交价格</th>
+            <th class="num">成交数量</th>
+            <th class="num">成交金额 (USDC)</th>
+            <th class="num">手续费</th>
+            <th class="num">已实现盈亏</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--text-muted)">15分钟前 14:32:01</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">HYPE</span>
+                <span class="badge-tag badge-long">买入开多</span>
+              </div>
+            </td>
+            <td><span style="color:var(--green-accent)">Maker (-0.002%)</span></td>
+            <td class="num">$37.461</td>
+            <td class="num">12,000.00</td>
+            <td class="num">$449,532.00</td>
+            <td class="num pos">-$8.99 (返佣)</td>
+            <td class="num" style="color:var(--text-muted)">--</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">3小时前 11:15:20</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">SOL</span>
+                <span class="badge-tag badge-short">卖出开空</span>
+              </div>
+            </td>
+            <td><span>Taker (0.015%)</span></td>
+            <td class="num">$163.500</td>
+            <td class="num">8,500.00</td>
+            <td class="num">$1,389,750.00</td>
+            <td class="num">$208.46</td>
+            <td class="num" style="color:var(--text-muted)">--</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">1天前 16:40:12</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">ETH</span>
+                <span class="badge-tag badge-short">卖出平多</span>
+              </div>
+            </td>
+            <td><span style="color:var(--green-accent)">Maker</span></td>
+            <td class="num">$2,685.20</td>
+            <td class="num">558.60</td>
+            <td class="num">$1,500,000.00</td>
+            <td class="num pos">-$30.00</td>
+            <td class="num pos" style="font-weight:700">+$171,280.00</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">3天前 09:22:45</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">HYPE</span>
+                <span class="badge-tag badge-long">买入加多</span>
+              </div>
+            </td>
+            <td><span>Taker</span></td>
+            <td class="num">$33.115</td>
+            <td class="num">50,000.00</td>
+            <td class="num">$1,655,750.00</td>
+            <td class="num">$248.36</td>
+            <td class="num" style="color:var(--text-muted)">--</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">5天前 18:05:30</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">BTC</span>
+                <span class="badge-tag badge-long">买入平空</span>
+              </div>
+            </td>
+            <td><span style="color:var(--green-accent)">Maker</span></td>
+            <td class="num">$94,200.00</td>
+            <td class="num">33.97</td>
+            <td class="num">$3,200,000.00</td>
+            <td class="num pos">-$64.00</td>
+            <td class="num pos" style="font-weight:700">+$108,300.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 更多 面板 -->
+    <div id="tab-more" class="panel hidden empty-panel">更多数据模块（借贷质押、流动性做市收益与多签合约配置）即将上线</div>
+
+  </section>
+
+    <!-- 4. 未完成订单 (当前正在挂单委托) -->
+    <div id="tab-orders" class="panel hidden">
+      <table>
+        <thead class="thead">
+          <tr>
+            <th>委托时间</th>
+            <th>合约 / 方向</th>
+            <th>订单类型</th>
+            <th class="num">委托价格</th>
+            <th class="num">委托数量</th>
+            <th class="num">委托价值</th>
+            <th class="num">已成交比例</th>
+            <th class="num">触发条件 / 减仓</th>
+            <th class="num">状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--text-muted)">今天 12:45:00</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">SOL</span>
+                <span class="badge-tag badge-short">加仓空</span>
+              </div>
+            </td>
+            <td>限价限时 (GTC)</td>
+            <td class="num" style="color:var(--green-accent);font-weight:600">$166.500</td>
+            <td class="num">15,000.00</td>
+            <td class="num">$2,497,500</td>
+            <td class="num">0.0%</td>
+            <td class="num">普通开仓</td>
+            <td class="num"><span style="color:var(--orange)">挂单等待撮合</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">今天 08:30:12</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">HYPE</span>
+                <span class="badge-tag badge-short">止盈减多</span>
+              </div>
+            </td>
+            <td>止盈限价 (TP)</td>
+            <td class="num" style="color:var(--green-accent);font-weight:600">$42.000</td>
+            <td class="num">50,000.00</td>
+            <td class="num">$2,100,000</td>
+            <td class="num">0.0%</td>
+            <td class="num" style="color:var(--green-accent)">只减仓 (Reduce-Only)</td>
+            <td class="num"><span style="color:var(--orange)">条件等待触发</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">昨天 21:10:05</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">SOL</span>
+                <span class="badge-tag badge-long">止损平空</span>
+              </div>
+            </td>
+            <td>止损市价 (SL)</td>
+            <td class="num" style="color:var(--red);font-weight:600">$172.000</td>
+            <td class="num">62,426.22</td>
+            <td class="num">$10,737,309</td>
+            <td class="num">0.0%</td>
+            <td class="num" style="color:var(--red)">标记价 ≥ $172 强平止损</td>
+            <td class="num"><span style="color:var(--orange)">条件等待触发</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. 成交记录 (历史真实撮合账单流水) -->
+    <div id="tab-fills" class="panel hidden">
+      <table>
+        <thead class="thead">
+          <tr>
+            <th>成交时间</th>
+            <th>合约标的 / 操作</th>
+            <th>角色 (Maker/Taker)</th>
+            <th class="num">成交价格</th>
+            <th class="num">成交数量</th>
+            <th class="num">成交金额 (USDC)</th>
+            <th class="num">手续费</th>
+            <th class="num">已实现盈亏</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--text-muted)">15分钟前 14:32:01</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">HYPE</span>
+                <span class="badge-tag badge-long">买入开多</span>
+              </div>
+            </td>
+            <td><span style="color:var(--green-accent)">Maker (-0.002%)</span></td>
+            <td class="num">$37.461</td>
+            <td class="num">12,000.00</td>
+            <td class="num">$449,532.00</td>
+            <td class="num pos">-$8.99 (返佣)</td>
+            <td class="num" style="color:var(--text-muted)">--</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">3小时前 11:15:20</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">SOL</span>
+                <span class="badge-tag badge-short">卖出开空</span>
+              </div>
+            </td>
+            <td><span>Taker (0.015%)</span></td>
+            <td class="num">$163.500</td>
+            <td class="num">8,500.00</td>
+            <td class="num">$1,389,750.00</td>
+            <td class="num">$208.46</td>
+            <td class="num" style="color:var(--text-muted)">--</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">1天前 16:40:12</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">ETH</span>
+                <span class="badge-tag badge-short">卖出平多</span>
+              </div>
+            </td>
+            <td><span style="color:var(--green-accent)">Maker</span></td>
+            <td class="num">$2,685.20</td>
+            <td class="num">558.60</td>
+            <td class="num">$1,500,000.00</td>
+            <td class="num pos">-$30.00</td>
+            <td class="num pos" style="font-weight:700">+$171,280.00</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">3天前 09:22:45</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">HYPE</span>
+                <span class="badge-tag badge-long">买入加多</span>
+              </div>
+            </td>
+            <td><span>Taker</span></td>
+            <td class="num">$33.115</td>
+            <td class="num">50,000.00</td>
+            <td class="num">$1,655,750.00</td>
+            <td class="num">$248.36</td>
+            <td class="num" style="color:var(--text-muted)">--</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted)">5天前 18:05:30</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:700;color:#fff">BTC</span>
+                <span class="badge-tag badge-long">买入平空</span>
+              </div>
+            </td>
+            <td><span style="color:var(--green-accent)">Maker</span></td>
+            <td class="num">$94,200.00</td>
+            <td class="num">33.97</td>
+            <td class="num">$3,200,000.00</td>
+            <td class="num pos">-$64.00</td>
+            <td class="num pos" style="font-weight:700">+$108,300.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+</div>
+
+<!-- 跟单配置弹窗 -->
+<div class="modal-backdrop" id="copy-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green-accent)" stroke-width="2.5"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+        配置跟单策略
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="关闭">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="target-trader">
+        <div class="target-info">
+          <span class="target-label">跟单目标交易员 (聪明资金)</span>
+          <span class="target-addr">0x456f...01ac</span>
+        </div>
+        <div class="target-stat">
+          <div class="target-stat-val">+66.7%</div>
+          <div class="target-stat-lab">历史胜率</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label-row">
+          <span class="form-label">跟单本金</span>
+          <span class="form-extra">可用余额: 12,450.00 USDC</span>
+        </div>
+        <div class="input-wrap">
+          <input type="number" class="form-input" id="copy-amount" value="1000" min="50" step="50">
+          <span class="input-unit">USDC</span>
+        </div>
+        <div class="quick-chips">
+          <span class="chip" data-amt="500">500</span>
+          <span class="chip active" data-amt="1000">1,000</span>
+          <span class="chip" data-amt="3000">3,000</span>
+          <span class="chip" data-amt="5000">5,000</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label-row">
+          <span class="form-label">跟单仓位杠杆倍率</span>
+          <span class="form-extra" id="ratio-display" style="color:var(--green-accent)">1.0x (原比例)</span>
+        </div>
+        <div class="slider-row">
+          <input type="range" class="range-slider" id="ratio-slider" min="0.2" max="3.0" step="0.1" value="1.0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label-row">
+          <span class="form-label">账户强制止损保护</span>
+          <span class="form-extra" style="color:var(--red)">亏损达限自动全平</span>
+        </div>
+        <div class="input-wrap">
+          <input type="number" class="form-input" id="stop-loss" value="20" min="5" max="60">
+          <span class="input-unit">% 回撤</span>
+        </div>
+      </div>
+
+      <div class="check-row checked" id="sync-check">
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="check-text">
+          <span class="check-title">立即同步建立现有持仓 (SOL / HYPE)</span>
+          <span class="check-sub">按最新标记价格与当前比例同步建立相同开仓方向头寸</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" id="btn-cancel">取消</button>
+      <button class="btn-confirm" id="btn-confirm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        确定跟单
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 提示框 Toast -->
+<div class="toast-msg" id="toast">
+  <svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+  <span id="toast-text">跟单已成功启动！</span>
+</div>
+
+<script>
+// 复制钱包地址
+const copy = document.getElementById('copy');
+const copyText = document.getElementById('copy-text');
+copy.onclick = async () => {
+  const t = document.getElementById('addr').textContent;
+  try {
+    await navigator.clipboard.writeText(t);
+    copyText.textContent = '已复制';
+    copy.style.borderColor = 'var(--border-active)';
+    setTimeout(() => {
+      copyText.textContent = '复制';
+      copy.style.borderColor = '';
+    }, 1500);
+  } catch(e) {
+    copyText.textContent = '复制失败';
+  }
+};
+
+// 收藏按钮切换
+const fav = document.getElementById('fav');
+const favIcon = document.getElementById('fav-icon');
+fav.onclick = () => {
+  const isFav = favIcon.textContent === '★';
+  favIcon.textContent = isFav ? '☆' : '★';
+  fav.style.color = isFav ? '' : '#e3b341';
+  fav.style.borderColor = isFav ? '' : '#433719';
+};
+
+// 顶部下拉交互：通知 + 钱包
+const noticeBtn = document.getElementById('notice-btn');
+const noticeDropdown = document.getElementById('notice-dropdown');
+const noticeDot = document.getElementById('notice-dot');
+const noticeClear = document.getElementById('notice-clear');
+
+noticeBtn.onclick = (e) => {
+  e.stopPropagation();
+  walletDropdown.classList.remove('open');
+  noticeDropdown.classList.toggle('open');
+};
+
+noticeClear.onclick = () => {
+  noticeDot.style.display = 'none';
+  showToast('已清空全部未读通知');
+};
+
+const walletBtn = document.getElementById('wallet-btn');
+const walletDropdown = document.getElementById('wallet-dropdown');
+
+walletBtn.onclick = (e) => {
+  e.stopPropagation();
+  noticeDropdown.classList.remove('open');
+  walletDropdown.classList.toggle('open');
+};
+
+document.getElementById('wallet-dd-copy').onclick = async () => {
+  await navigator.clipboard.writeText('0x89C3d4e8F4628001004a8b7927e10398ef3D4e');
+  showToast('已复制当前连接的钱包地址');
+};
+
+function switchLang(lang) {
+  document.querySelectorAll('.lang-pill').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  showToast(lang === 'zh' ? '已切换系统语言：简体中文' : 'Switched language to English');
+}
+
+function showInviteModal() {
+  walletDropdown.classList.remove('open');
+  showToast('邀请码【SMART-8888】已复制，享受 20% 返佣');
+}
+
+// 点击空白关闭下拉
+document.addEventListener('click', () => {
+  noticeDropdown.classList.remove('open');
+  walletDropdown.classList.remove('open');
+});
+
+// 跟单弹窗逻辑
+const copyModal = document.getElementById('copy-modal');
+const copyTradeBtn = document.getElementById('copytrade');
+const modalClose = document.getElementById('modal-close');
+const btnCancel = document.getElementById('btn-cancel');
+const btnConfirm = document.getElementById('btn-confirm');
+const toast = document.getElementById('toast');
+const toastText = document.getElementById('toast-text');
+
+copyTradeBtn.onclick = () => copyModal.classList.add('open');
+const closeModal = () => copyModal.classList.remove('open');
+modalClose.onclick = closeModal;
+btnCancel.onclick = closeModal;
+copyModal.onclick = (e) => { if (e.target === copyModal) closeModal(); };
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && copyModal.classList.contains('open')) closeModal();
+});
+
+const copyAmtInput = document.getElementById('copy-amount');
+document.querySelectorAll('.quick-chips .chip').forEach(chip => {
+  chip.onclick = function() {
+    document.querySelectorAll('.quick-chips .chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    copyAmtInput.value = this.dataset.amt;
+  };
+});
+
+const ratioSlider = document.getElementById('ratio-slider');
+const ratioDisplay = document.getElementById('ratio-display');
+ratioSlider.oninput = function() {
+  const val = parseFloat(this.value);
+  let text = `${val.toFixed(1)}x`;
+  if (val === 1.0) text += ' (原比例)';
+  else if (val < 1.0) text += ' (保守跟单)';
+  else text += ' (激进放大)';
+  ratioDisplay.textContent = text;
+};
+
+const syncCheck = document.getElementById('sync-check');
+syncCheck.onclick = function() { this.classList.toggle('checked'); };
+
+function showToast(msg) {
+  toastText.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+btnConfirm.onclick = () => {
+  btnConfirm.innerHTML = '正在签名提交合约...';
+  btnConfirm.style.opacity = '0.7';
+
+  setTimeout(() => {
+    btnConfirm.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> 确定跟单`;
+    btnConfirm.style.opacity = '';
+    closeModal();
+    showToast(`跟单已成功启动！正在前往「我的跟单」进行实时监控...`);
+    setTimeout(() => {
+      window.location.href = 'copytrade.html';
+    }, 900);
+  }, 700);
+};
+
+// 底部选项卡切换
+document.querySelectorAll('.tabs .tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tabs .tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+    const target = document.getElementById(btn.dataset.tab);
+    if (target) target.classList.remove('hidden');
+  });
+});
+
+// 已关闭交易 - 单笔复盘展开/折叠
+function toggleReplay(key, tr) {
+  const drawer = document.getElementById(`drawer-${key}`);
+  if (!drawer) {
+    showToast(`暂未生成 ${key.toUpperCase()} 的单笔量化复盘报告`);
+    return;
+  }
+  const isExpanded = tr.classList.contains('expanded');
+  if (isExpanded) {
+    tr.classList.remove('expanded');
+    drawer.style.display = 'none';
+  } else {
+    tr.classList.add('expanded');
+    drawer.style.display = '';
+  }
+}
+
+// 已关闭交易 - 图表摘要 / Fills 子视图切换
+function switchDrawerTab(e, key, viewType) {
+  e.stopPropagation();
+  const parent = e.target.closest('.drawer-subtabs');
+  parent.querySelectorAll('.drawer-subtab-btn').forEach(b => b.classList.remove('active'));
+  e.target.closest('.drawer-subtab-btn').classList.add('active');
+
+  const summaryView = document.getElementById(`${key}-view-summary`);
+  const fillsView = document.getElementById(`${key}-view-fills`);
+
+  if (viewType === 'summary') {
+    summaryView.style.display = 'grid';
+    fillsView.style.display = 'none';
+  } else {
+    summaryView.style.display = 'none';
+    fillsView.style.display = 'block';
+  }
+}
+
+// 已关闭交易 - 统计周期切换
+const periodsList = ['全部时间', '过去 90 天', '过去 30 天', '过去 7 天'];
+let periodIndex = 0;
+function toggleClosedPeriod() {
+  periodIndex = (periodIndex + 1) % periodsList.length;
+  const label = periodsList[periodIndex];
+  document.getElementById('closed-period-label').textContent = label;
+  showToast(`已切换已关闭交易统计周期：${label}`);
+}
+
+// 图表筛选工具交互
+document.querySelectorAll('.tool-group .tool').forEach(t => {
+  t.addEventListener('click', function() {
+    const parent = this.closest('.tool-group');
+    if (parent) {
+      parent.querySelectorAll('.tool').forEach(el => el.classList.remove('on'));
+      this.classList.add('on');
+    }
+  });
+});
+
+// 左侧 Pills 交互
+document.querySelectorAll('.switchline .pill, .periods .pill').forEach(pill => {
+  pill.addEventListener('click', function() {
+    const parent = this.parentElement;
+    parent.querySelectorAll('.pill').forEach(el => el.classList.remove('on'));
+    this.classList.add('on');
+  });
+});
+</script>
+</body>
+</html>

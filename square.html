@@ -1,0 +1,2256 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SmartLiquid - 跟单广场</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #090a0b;
+  --panel: #111315;
+  --panel-card: #14171a;
+  --panel-hover: #181c21;
+  --border-subtle: #202429;
+  --border-strong: #2a3037;
+  --border-active: #3a424c;
+  --text-main: #f3f5f7;
+  --text-secondary: #c5cbd2;
+  --text-dim: #8b949e;
+  --text-muted: #57606a;
+  --green: #2ecc71;
+  --green-accent: #3dd68c;
+  --green-badge: rgba(46, 204, 113, 0.08);
+  --green-badge-border: rgba(46, 204, 113, 0.22);
+  --red: #f85149;
+  --red-badge: rgba(248, 81, 73, 0.08);
+  --red-badge-border: rgba(248, 81, 73, 0.22);
+  --orange: #e3b341;
+  --orange-badge: rgba(227, 179, 65, 0.08);
+  --orange-badge-border: rgba(227, 179, 65, 0.25);
+  --blue: #3b82f6;
+  --blue-badge: rgba(59, 130, 246, 0.08);
+  --blue-badge-border: rgba(59, 130, 246, 0.22);
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+body { min-width: 1160px; }
+button, input { font: inherit; outline: none; border: none; }
+
+.app {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+}
+
+/* ========================================================
+   顶级导航栏 (平铺无嵌套、统一清晰)
+   ======================================================== */
+.topbar {
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 24px;
+  position: relative;
+}
+
+/* 左侧品牌与主频道：仅 跟单广场 | 市场行情 | 合约交易 */
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+}
+.brand-logo-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #161a1e;
+  border: 1px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+}
+.brand-logo-badge svg { width: 15px; height: 15px; fill: var(--text-secondary); }
+.brand:hover .brand-logo-badge svg { fill: var(--green-accent); }
+.brand-word { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
+.brand-word b { color: var(--green-accent); }
+
+.platform-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.platform-link {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 8px 0;
+  position: relative;
+  transition: color 0.15s ease;
+}
+.platform-link:hover { color: #fff; }
+.platform-link.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+.platform-link.active::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  background: var(--green);
+  left: 0;
+  right: 0;
+  bottom: -14px;
+}
+
+/* 右侧个人功能区：纯平铺，绝不 box 套 box */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* 我的跟单按钮 */
+.nav-btn-copy {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+.nav-btn-copy:hover {
+  background: #1b2025;
+  border-color: var(--border-strong);
+  color: #fff;
+}
+.nav-copy-badge {
+  padding: 0 5px;
+  height: 16px;
+  line-height: 15px;
+  border-radius: 8px;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  color: var(--green-accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* 通知铃铛 */
+.notice-wrap { position: relative; }
+.nav-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+}
+.nav-icon-btn:hover {
+  background: #1c2126;
+  color: #fff;
+  border-color: var(--border-strong);
+}
+.nav-icon-btn svg { width: 14px; height: 14px; }
+.unread-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 5px;
+  height: 5px;
+  background: var(--green-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--green-accent);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 40px;
+  right: -10px;
+  width: 310px;
+  background: #13161a;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dropdown-menu.open { display: flex; }
+.dropdown-header {
+  padding: 10px 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #16191e;
+}
+.dropdown-clear { font-size: 10.5px; color: var(--text-muted); cursor: pointer; }
+.notice-item {
+  padding: 10px 14px;
+  border-bottom: 1px solid #191e23;
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+}
+.notice-item:hover { background: rgba(255, 255, 255, 0.02); }
+.notice-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--green-accent);
+  font-size: 10px;
+}
+.notice-title { font-size: 11.5px; color: #fff; font-weight: 500; }
+.notice-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.notice-time { font-size: 9px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 3px; }
+
+/* 钱包卡片 */
+.wallet-wrap { position: relative; }
+.nav-wallet-btn {
+  height: 32px;
+  padding: 0 10px 0 5px;
+  border-radius: 6px;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.nav-wallet-btn:hover {
+  background: #1c2126;
+  border-color: var(--border-strong);
+}
+.avatar-jazz {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%);
+  display: grid;
+  place-items: center;
+}
+.wallet-addr {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-main);
+  font-weight: 600;
+}
+.wallet-balance {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green-accent);
+  background: rgba(46, 204, 113, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.wallet-down-arrow { width: 11px; height: 11px; color: var(--text-muted); }
+
+.wallet-dropdown {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  width: 280px;
+  background: #121519;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+  z-index: 500;
+  display: none;
+  flex-direction: column;
+  padding: 8px;
+}
+.wallet-dropdown.open { display: flex; }
+.wallet-dd-header {
+  padding: 10px 12px;
+  background: #171b20;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+.wallet-dd-item {
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.wallet-dd-item:hover { background: #1a2026; color: #fff; }
+.wallet-dd-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.lang-switch-pills {
+  display: inline-flex;
+  background: #0d0f11;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 2px;
+  gap: 2px;
+}
+.lang-pill {
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.lang-pill:hover { color: #fff; }
+.lang-pill.active {
+  background: #1f252c;
+  color: #fff;
+  font-weight: 700;
+}
+.invite-reward-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--green-badge);
+  border: 1px solid var(--green-badge-border);
+  color: var(--green-accent);
+  font-family: var(--font-mono);
+}
+.wallet-dd-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 6px;
+}
+
+/* ========================================================
+   1. 页面标题 + 钱包全景命令搜索栏 (现代机构级终端风)
+   ======================================================== */
+.hero-header {
+  margin-bottom: 20px;
+}
+.hero-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.hero-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hero-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: #ffffff;
+}
+.hero-subtitle {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+/* 顶部全网实时量化指标胶囊 */
+.hero-market-glance {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: #0f1215;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+.glance-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+}
+.glance-lab { color: var(--text-muted); font-size: 10.5px; }
+.glance-val {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #fff;
+  font-size: 12px;
+  font-feature-settings: "tnum" 1;
+}
+
+/* 整行智能建档搜索命令栏 (微光双层外壳) */
+.search-terminal-bar {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  background: linear-gradient(180deg, #121519 0%, #0d0f12 100%);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 0 6px 0 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.search-terminal-bar:focus-within {
+  border-color: rgba(46, 204, 113, 0.45);
+  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.08), 0 6px 24px rgba(0, 0, 0, 0.45);
+  background: #121519;
+}
+.search-terminal-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--text-muted);
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.search-terminal-input {
+  flex: 1;
+  background: transparent;
+  color: #fff;
+  font-size: 12.5px;
+  font-family: var(--font-sans);
+}
+.search-terminal-input::placeholder {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.search-terminal-hints {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  border-left: 1px solid var(--border-subtle);
+  margin-right: 8px;
+  user-select: none;
+}
+.hint-badge {
+  background: #171b20;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--text-dim);
+  border: 1px solid var(--border-subtle);
+}
+.btn-analyze {
+  height: 32px;
+  padding: 0 16px;
+  background: linear-gradient(180deg, #18241b 0%, #121a14 100%);
+  border: 1px solid rgba(46, 204, 113, 0.45);
+  border-radius: 6px;
+  color: var(--green-accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+.btn-analyze:hover {
+  background: #1e3023;
+  border-color: var(--green);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(46, 204, 113, 0.22);
+}
+
+/* ========================================================
+   2. 风格 Tab + 筛选工具控制条 (收敛为专业单条整合设计)
+   ======================================================== */
+.control-hub-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  margin-bottom: 12px;
+  padding: 6px 8px;
+  background: #111417;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  gap: 12px;
+}
+
+.style-tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.style-tab-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.style-tab-btn:hover {
+  color: #fff;
+  background: #161a1f;
+}
+.style-tab-btn.active {
+  background: #1c2229;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+.style-tab-badge {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--text-muted);
+}
+.style-tab-btn.active .style-tab-badge {
+  color: var(--green-accent);
+}
+
+.control-hub-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 高级筛选折叠展开按钮 */
+.btn-toggle-filters {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: #161a1f;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+.btn-toggle-filters:hover {
+  background: #1e242c;
+  color: #fff;
+  border-color: var(--border-strong);
+}
+.btn-toggle-filters.open {
+  background: #1a222c;
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.35);
+}
+.filter-active-count {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  padding: 1px 5px;
+  border-radius: 10px;
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+  font-weight: 700;
+}
+
+/* ========================================================
+   3. 抽屉式收拢高级筛选区 (可折叠，收起时不占用视线)
+   ======================================================== */
+.filter-card {
+  background: linear-gradient(180deg, #111417 0%, #0d0f11 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.filter-card.collapsed {
+  display: none;
+}
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px 18px;
+}
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.filter-label {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.filter-options {
+  display: flex;
+  gap: 3px;
+  background: #090b0d;
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  padding: 2px;
+}
+.filter-chip {
+  flex: 1;
+  height: 23px;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+.filter-chip:hover {
+  color: #fff;
+}
+.filter-chip.active {
+  background: #1c2228;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+/* ========================================================
+   4. 结果控制栏 (Result Control Bar) - 精致单行
+   ======================================================== */
+.control-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  background: #0c0e11;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0 12px;
+  margin-bottom: 16px;
+}
+.control-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.control-period-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.control-period-val {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: #fff;
+  background: #15181d;
+  border: 1px solid var(--border-subtle);
+  padding: 1.5px 7px;
+  border-radius: 4px;
+  font-size: 10.5px;
+}
+.control-count {
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+.control-count b {
+  font-family: var(--font-mono);
+  color: #fff;
+  font-weight: 700;
+  margin-right: 2px;
+  font-feature-settings: "tnum" 1;
+}
+.control-reset-btn {
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+.control-reset-btn:hover {
+  color: var(--text-main);
+}
+
+.control-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sort-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.sort-select {
+  background: #14181c;
+  border: 1px solid var(--border-subtle);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2.5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+}
+.order-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: #14181c;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.order-btn:hover {
+  background: #1a2027;
+  color: #fff;
+}
+.view-switch {
+  display: inline-flex;
+  background: #090b0d;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 2px;
+  gap: 2px;
+}
+.view-switch-btn {
+  width: 22px;
+  height: 20px;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.view-switch-btn.active {
+  background: #1a2027;
+  color: #fff;
+}
+
+/* ========================================================
+   5. 钱包结果卡片 (现代机构级 Double-Bezel 精雕外壳)
+   ======================================================== */
+.wallets-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.wallet-card {
+  background: linear-gradient(180deg, #13161a 0%, #0e1013 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 16px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.wallet-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+  pointer-events: none;
+}
+.wallet-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-active);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* 卡片顶部 */
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.card-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #14181c;
+  border: 1px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--green-accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono);
+}
+.card-id-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.card-address {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: -0.2px;
+}
+.card-badge-profile {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.card-top-pnl {
+  text-align: right;
+}
+.card-pnl-num {
+  font-family: var(--font-mono);
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-feature-settings: "tnum" 1;
+}
+.card-pnl-label {
+  font-size: 9.5px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+/* 风险与杠杆标签 */
+.card-tags-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tag-risk {
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 1.5px 6px;
+  border-radius: 3px;
+}
+.tag-risk-agg {
+  background: var(--red-badge);
+  color: #ff7b72;
+  border: 1px solid var(--red-badge-border);
+}
+.tag-risk-bal {
+  background: var(--orange-badge);
+  color: #e5be79;
+  border: 1px solid var(--orange-badge-border);
+}
+.tag-risk-safe {
+  background: var(--blue-badge);
+  color: #60a5fa;
+  border: 1px solid var(--blue-badge-border);
+}
+.tag-leverage {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: #0f1215;
+  border: 1px solid var(--border-subtle);
+  padding: 1.5px 6px;
+  border-radius: 3px;
+}
+
+/* 核心收益指标 (大字号 ROI + Sparkline 走势) */
+.card-roi-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #0a0d10;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+.roi-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.roi-big {
+  font-family: var(--font-mono);
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.05;
+  font-feature-settings: "tnum" 1;
+}
+.roi-sub {
+  font-size: 9.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.sparkline-svg {
+  width: 105px;
+  height: 32px;
+}
+
+/* 三项核心数据 (资金量 / 风险 / 稳定性) */
+.card-stats-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  border-top: 1px solid rgba(32, 36, 41, 0.6);
+  padding-top: 10px;
+}
+.stat-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat-col-lab {
+  font-size: 9.5px;
+  color: var(--text-muted);
+}
+.stat-col-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  font-feature-settings: "tnum" 1;
+}
+
+/* 钱包交易特征 */
+.card-feature-hint {
+  font-size: 10px;
+  color: var(--text-dim);
+  background: #0f1215;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 5px;
+  padding: 6px 10px;
+  line-height: 1.35;
+}
+
+/* 操作底栏 */
+.card-bottom-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 2px;
+}
+.btn-view-detail {
+  padding: 4.5px 11px;
+  border-radius: 5px;
+  background: #14181c;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-view-detail:hover {
+  background: #1c2228;
+  border-color: var(--border-active);
+  color: #fff;
+}
+.btn-quick-copy {
+  padding: 4.5px 12px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #16241b 0%, #111a14 100%);
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  color: var(--green-accent);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.btn-quick-copy:hover {
+  background: #1d3023;
+  border-color: var(--green);
+  color: #fff;
+}
+
+.pos { color: var(--green-accent); }
+.neg { color: var(--red); }
+
+/* 跟单配置弹窗 (Modal) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-backdrop.open { opacity: 1; pointer-events: auto; }
+.modal-box {
+  width: 460px;
+  background: #111316;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  transform: scale(0.96) translateY(8px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-backdrop.open .modal-box { transform: scale(1) translateY(0); }
+.modal-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  background: #14171b;
+}
+.modal-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.modal-close:hover { background: #1f252c; color: #fff; }
+.modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.target-trader {
+  background: #16191d;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.target-info { display: flex; flex-direction: column; gap: 3px; }
+.target-label { font-size: 10.5px; color: var(--text-muted); }
+.target-addr { font-family: var(--font-mono); font-size: 12px; color: #fff; font-weight: 600; }
+.target-stat { text-align: right; }
+.target-stat-val { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--green-accent); }
+.target-stat-lab { font-size: 10px; color: var(--text-muted); }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label-row { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; }
+.form-label { color: var(--text-secondary); font-weight: 500; }
+.form-extra { color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; }
+.input-wrap { position: relative; display: flex; align-items: center; }
+.form-input {
+  width: 100%;
+  height: 38px;
+  background: #0d0f11;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0 54px 0 12px;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.form-input:focus { border-color: var(--border-active); background: #121518; }
+.input-unit {
+  position: absolute;
+  right: 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.slider-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+.range-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  background: #202429;
+  border-radius: 2px;
+  outline: none;
+}
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #111316;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+}
+.range-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.quick-chips { display: flex; gap: 6px; margin-top: 6px; }
+.chip {
+  flex: 1;
+  padding: 5px 0;
+  background: #14171a;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+.chip:hover { color: #fff; border-color: var(--border-strong); }
+.chip.active { background: #1f252c; color: #fff; border-color: var(--border-active); font-weight: 600; }
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background: #13161a;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.check-box {
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  border: 1px solid var(--border-strong);
+  background: #0d0f11;
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.check-row.checked .check-box { background: var(--green); border-color: var(--green); }
+.check-box svg { width: 11px; height: 11px; stroke: #000; opacity: 0; }
+.check-row.checked .check-box svg { opacity: 1; }
+.check-text { display: flex; flex-direction: column; gap: 2px; }
+.check-title { font-size: 11.5px; color: #fff; font-weight: 500; }
+.check-sub { font-size: 10.5px; color: var(--text-muted); }
+
+.modal-footer {
+  padding: 14px 20px;
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid var(--border-subtle);
+  background: #14171b;
+}
+.btn-cancel {
+  flex: 1;
+  height: 38px;
+  background: #191c20;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-cancel:hover { background: #1f252c; color: #fff; }
+.btn-confirm {
+  flex: 2;
+  height: 38px;
+  background: #171b1f;
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  border-radius: 6px;
+  color: var(--green-accent);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-confirm:hover { background: #1f262b; border-color: var(--green); color: #fff; }
+.btn-confirm:active { transform: scale(0.99); }
+
+.toast-msg {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: #14181c;
+  border: 1px solid var(--border-strong);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast-msg.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 1200px) {
+  .wallets-grid { grid-template-columns: repeat(2, 1fr); }
+  .filter-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 顶级导航栏：仅 跟单广场 | 市场行情 | 合约交易，右侧纯平铺无嵌套 box -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a class="brand" href="square.html">
+        <div class="brand-logo-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.2L18.8 8 12 11.8 5.2 8 12 4.2zM5 9.8l6 3.3v7.1l-6-3.3V9.8zm8 10.4v-7.1l6-3.3v7.1l-6 3.3z"/></svg>
+        </div>
+        <span class="brand-word">SMART<b>LIQUID</b></span>
+      </a>
+      <nav class="platform-nav">
+        <a href="square.html" class="platform-link active" title="跟单广场：全网值得跟随的交易钱包排行榜">跟单广场</a>
+        <a href="javascript:void(0)" class="platform-link" onclick="showToast('这期不做')">市场行情</a>
+        <a href="javascript:void(0)" class="platform-link" onclick="showToast('这期不做')">合约交易</a>
+      </nav>
+    </div>
+
+    <!-- 右侧功能元素：平铺排列，不设外层包裹 box -->
+    <div class="topbar-right">
+      <!-- 1. 我的跟单 -->
+      <a href="copytrade.html" class="nav-btn-copy" title="查看我当前正在运行的跟单策略">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <span>我的跟单</span>
+        <span class="nav-copy-badge">2</span>
+      </a>
+
+      <!-- 2. 通知铃铛 -->
+      <div class="notice-wrap">
+        <button class="nav-icon-btn" id="notice-btn" title="消息与成交通知">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span class="unread-dot" id="notice-dot"></span>
+        </button>
+        <div class="dropdown-menu" id="notice-dropdown">
+          <div class="dropdown-header">
+            <span>个人交易通知</span>
+            <span class="dropdown-clear" onclick="document.getElementById('notice-dot').style.display='none';showToast('已全部标记为已读')">全部已读</span>
+          </div>
+          <div class="notice-item">
+            <div class="notice-icon">✓</div>
+            <div>
+              <div class="notice-title">跟单开仓成功</div>
+              <div class="notice-desc">跟随 0x456f 同步建立 HYPE 多头仓位，开仓价 $37.46</div>
+              <div class="notice-time">10分钟前</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. 钱包头像与地址 -->
+      <div class="wallet-wrap">
+        <div class="nav-wallet-btn" id="wallet-btn">
+          <div class="avatar-jazz">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+          </div>
+          <span class="wallet-addr">0x89C...3D4e</span>
+          <span class="wallet-balance">12,450 USDC</span>
+          <svg class="wallet-down-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="wallet-dropdown" id="wallet-dropdown">
+          <!-- 顶部资产与网络 -->
+          <div class="wallet-dd-header">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:10px;color:var(--text-muted)">当前网络: Arbitrum One</span>
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span>
+            </div>
+            <div style="font-family:var(--font-mono);font-size:14px;color:#fff;font-weight:700;margin-top:3px">12,450.00 USDC</div>
+          </div>
+
+          <!-- 语言切换 (明显独立行) -->
+          <div class="wallet-dd-item" style="cursor:default">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>系统语言</span>
+            </div>
+            <div class="lang-switch-pills">
+              <span class="lang-pill active" onclick="switchLang('zh')">中文</span>
+              <span class="lang-pill" onclick="switchLang('en')">EN</span>
+            </div>
+          </div>
+
+          <!-- 我的邀请 (跳转独立邀请页面) -->
+          <a class="wallet-dd-item" id="wallet-dd-invite" href="invite.html">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7.5" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+              <span>我的邀请中心</span>
+            </div>
+            <span class="invite-reward-badge">返佣 20%</span>
+          </a>
+
+          <!-- 前往我的跟单 -->
+          <a class="wallet-dd-item" href="copytrade.html">
+            <div class="wallet-dd-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>我的跟单投资组合</span>
+            </div>
+            <span style="font-size:11px;color:var(--text-muted)">→</span>
+          </a>
+
+          <div class="wallet-dd-divider"></div>
+
+          <!-- 复制地址 -->
+          <div class="wallet-dd-item" onclick="showToast('已复制钱包地址')">
+            <div class="wallet-dd-left">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>复制钱包地址</span>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted)">0x89C...3D4e</span>
+          </div>
+
+          <!-- 断开连接 -->
+          <div class="wallet-dd-item" style="color:#ff757e" onclick="showToast('已断开连接')">
+            <div class="wallet-dd-left">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>断开钱包连接</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1. 页面标题 + 全网量化指标 + 钱包全景命令搜索栏 -->
+  <section class="hero-header">
+    <div class="hero-title-row">
+      <div class="hero-title-group">
+        <h1 class="hero-title">发现全网高胜率交易钱包</h1>
+        <p class="hero-subtitle">基于 Hyperliquid 链上全量订单流水与实盘盈亏深度穿透，实时捕捉顶级聪明资金与盈利机构</p>
+      </div>
+      <!-- 市场整体量化截面微型仪表盘 -->
+      <div class="hero-market-glance">
+        <div class="glance-item">
+          <span class="glance-lab">全网监控:</span>
+          <span class="glance-val">1,000 个</span>
+        </div>
+        <div style="width:1px;height:12px;background:var(--border-subtle)"></div>
+        <div class="glance-item">
+          <span class="glance-lab">30D 净收益:</span>
+          <span class="glance-val pos">+$48.2M</span>
+        </div>
+        <div style="width:1px;height:12px;background:var(--border-subtle)"></div>
+        <div class="glance-item">
+          <span class="glance-lab">聪明钱胜率:</span>
+          <span class="glance-val" style="color:var(--green-accent)">68.4%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 一整行终端命令搜索栏 (微光双层外壳) -->
+    <div class="search-terminal-bar">
+      <svg class="search-terminal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" class="search-terminal-input" id="search-input" placeholder="输入钱包地址（如 0x456f...）或风格标签（如 主流币波段、做市对冲、多头巨鲸）..." />
+      <div class="search-terminal-hints">
+        <span>支持任意 EVM / Hyperliquid 地址</span>
+        <span class="hint-badge">即刻建档</span>
+      </div>
+      <button class="btn-analyze" id="btn-analyze">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        智能穿透
+      </button>
+    </div>
+  </section>
+
+  <!-- 2. 整合式风格 Tab + 筛选抽屉控制工具条 -->
+  <section class="control-hub-bar">
+    <div class="style-tabs-row" id="style-tabs">
+      <button class="style-tab-btn active" data-style="all">全网精选 <span class="style-tab-badge">1,000</span></button>
+      <button class="style-tab-btn" data-style="swing">波段主力 <span class="style-tab-badge">432</span></button>
+      <button class="style-tab-btn" data-style="long">长线巨鲸 <span class="style-tab-badge">248</span></button>
+      <button class="style-tab-btn" data-style="day">日内高频 <span class="style-tab-badge">186</span></button>
+      <button class="style-tab-btn" data-style="algo">算法做市 <span class="style-tab-badge">134</span></button>
+    </div>
+
+    <div class="control-hub-right">
+      <button class="btn-toggle-filters" id="btn-toggle-filters">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+        <span>多维量化筛选</span>
+        <span class="filter-active-count">8项</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- 3. 抽屉式收拢高级筛选区 (默认展开，支持折叠收起) -->
+  <section class="filter-card" id="filter-card">
+    <div class="filter-grid">
+      <!-- 维度1: 资产类型 -->
+      <div class="filter-group">
+        <span class="filter-label">资产标的</span>
+        <div class="filter-options" data-dim="asset">
+          <div class="filter-chip">股票</div>
+          <div class="filter-chip">大宗商品</div>
+          <div class="filter-chip active">主流代币</div>
+          <div class="filter-chip">Meme/山寨</div>
+        </div>
+      </div>
+
+      <!-- 维度2: 风险等级 -->
+      <div class="filter-group">
+        <span class="filter-label">风险偏好</span>
+        <div class="filter-options" data-dim="risk">
+          <div class="filter-chip">稳健低波</div>
+          <div class="filter-chip active">均衡博弈</div>
+          <div class="filter-chip">高波激进</div>
+        </div>
+      </div>
+
+      <!-- 维度3: 账户规模 -->
+      <div class="filter-group">
+        <span class="filter-label">仓位规模</span>
+        <div class="filter-options" data-dim="scale">
+          <div class="filter-chip">&lt;$100K</div>
+          <div class="filter-chip active">$100K–$1M</div>
+          <div class="filter-chip">≥$1M 巨鲸</div>
+        </div>
+      </div>
+
+      <!-- 维度4: PNL -->
+      <div class="filter-group">
+        <span class="filter-label">累计 PNL</span>
+        <div class="filter-options" data-dim="pnl">
+          <div class="filter-chip">≥$10K</div>
+          <div class="filter-chip active">≥$100K</div>
+          <div class="filter-chip">≥$1M</div>
+        </div>
+      </div>
+
+      <!-- 维度5: ROI -->
+      <div class="filter-group">
+        <span class="filter-label">收益率 ROI</span>
+        <div class="filter-options" data-dim="roi">
+          <div class="filter-chip">≥10%</div>
+          <div class="filter-chip active">≥30%</div>
+          <div class="filter-chip">≥100%</div>
+        </div>
+      </div>
+
+      <!-- 维度6: 胜率 -->
+      <div class="filter-group">
+        <span class="filter-label">胜率 Win Rate</span>
+        <div class="filter-options" data-dim="winrate">
+          <div class="filter-chip">≥50%</div>
+          <div class="filter-chip active">≥60%</div>
+          <div class="filter-chip">≥70%</div>
+        </div>
+      </div>
+
+      <!-- 维度7: 最大回撤 -->
+      <div class="filter-group">
+        <span class="filter-label">最大回撤 MDD</span>
+        <div class="filter-options" data-dim="mdd">
+          <div class="filter-chip">≤10% 严格</div>
+          <div class="filter-chip active">≤20%</div>
+          <div class="filter-chip">≤30%</div>
+        </div>
+      </div>
+
+      <!-- 维度8: 平均杠杆 -->
+      <div class="filter-group">
+        <span class="filter-label">平均杠杆率</span>
+        <div class="filter-options" data-dim="leverage">
+          <div class="filter-chip">≤3x 低杠杆</div>
+          <div class="filter-chip active">3–10x 适中</div>
+          <div class="filter-chip">≥10x 高杠杆</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 结果控制栏 -->
+  <section class="control-bar">
+    <div class="control-left">
+      <div class="control-period-select" id="period-btn">
+        <span>统计周期：</span>
+        <span class="control-period-val">30天</span>
+      </div>
+      <div class="control-count">
+        <b id="result-count">1,000</b> 个钱包符合当前条件
+      </div>
+      <button class="control-reset-btn" id="btn-reset">重置筛选</button>
+    </div>
+
+    <div class="control-right">
+      <div class="sort-wrap">
+        <span>排序：</span>
+        <select class="sort-select" id="sort-select">
+          <option value="pnl">PNL (累计收益额)</option>
+          <option value="roi">ROI (收益率)</option>
+          <option value="winrate">胜率 (Win Rate)</option>
+          <option value="mdd">最大回撤 (低到高)</option>
+          <option value="scale">账户规模</option>
+        </select>
+      </div>
+
+      <button class="order-btn" id="btn-order" title="升序/降序切换">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="7 10 12 15 17 10"></polyline></svg>
+      </button>
+
+      <div class="view-switch">
+        <button class="view-switch-btn active" id="btn-view-card" title="卡片视图">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        </button>
+        <button class="view-switch-btn" id="btn-view-list" title="列表视图">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 钱包结果卡片 (3 列卡片布局 Grid) -->
+  <section class="wallets-grid" id="wallets-container">
+
+    <!-- 卡片 1 (标杆交易员 0x456f...01ac，对应钱包详情页) -->
+    <article class="wallet-card">
+      <div class="card-top">
+        <div class="card-identity">
+          <div class="card-avatar" style="color:#2ecc71;background:#142319;border-color:rgba(46,204,113,0.3)">45</div>
+          <div class="card-id-text">
+            <span class="card-address">0x456f...01ac</span>
+            <span class="card-badge-profile">主流币 · 波段 · 聪明资金</span>
+          </div>
+        </div>
+        <div class="card-top-pnl">
+          <div class="card-pnl-num pos">+$873,423</div>
+          <div class="card-pnl-label">30天变化</div>
+        </div>
+      </div>
+
+      <div class="card-tags-row">
+        <span class="tag-risk tag-risk-bal">均衡</span>
+        <span class="tag-leverage">均杠杆 8.02x</span>
+      </div>
+
+      <!-- 核心收益指标 (大字号 + Sparkline 迷你走势) -->
+      <div class="card-roi-block">
+        <div class="roi-left">
+          <span class="roi-big pos">+38.6%</span>
+          <span class="roi-sub">30D 收益率</span>
+        </div>
+        <svg class="sparkline-svg" viewBox="0 0 110 34">
+          <path d="M2 30 C 25 28, 45 15, 65 20 C 85 24, 92 8, 108 5" fill="none" stroke="#2ecc71" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="108" cy="5" r="3" fill="#2ecc71"/>
+        </svg>
+      </div>
+
+      <!-- 三项核心数据 (资金量 / 风险 / 稳定性) -->
+      <div class="card-stats-strip">
+        <div class="stat-col">
+          <span class="stat-col-lab">账户规模</span>
+          <span class="stat-col-val">+$19.01M</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">最大回撤</span>
+          <span class="stat-col-val" style="color:var(--orange)">14.8%</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">胜率</span>
+          <span class="stat-col-val pos">72.4%</span>
+        </div>
+      </div>
+
+      <!-- 钱包交易特征 -->
+      <div class="card-feature-hint">
+        主要盈利资产 <a href="token.html" style="color:var(--green-accent);text-decoration:none;font-weight:700" title="点击查看 SOPH/SOL 币种深度画像">SOL / HYPE ↗</a> · 中位持仓 12d 04h
+      </div>
+
+      <!-- 操作底栏 -->
+      <div class="card-bottom-actions">
+        <button class="btn-quick-copy" onclick="triggerCopy('0x456f...01ac')">跟单配置</button>
+        <a href="code.html" class="btn-view-detail">
+          查看详情
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- 卡片 2 (长线稳健交易员 0x7163...163b) -->
+    <article class="wallet-card">
+      <div class="card-top">
+        <div class="card-identity">
+          <div class="card-avatar" style="color:#60a5fa;background:#151c27;border-color:rgba(96,165,250,0.3)">71</div>
+          <div class="card-id-text">
+            <span class="card-address">0x7163...163b</span>
+            <span class="card-badge-profile">主流币 · 长线</span>
+          </div>
+        </div>
+        <div class="card-top-pnl">
+          <div class="card-pnl-num pos">+$407,147</div>
+          <div class="card-pnl-label">30天变化</div>
+        </div>
+      </div>
+
+      <div class="card-tags-row">
+        <span class="tag-risk tag-risk-agg">激进</span>
+        <span class="tag-leverage">均杠杆 6.5x</span>
+      </div>
+
+      <div class="card-roi-block">
+        <div class="roi-left">
+          <span class="roi-big pos">+14.2%</span>
+          <span class="roi-sub">30D 收益率</span>
+        </div>
+        <svg class="sparkline-svg" viewBox="0 0 110 34">
+          <path d="M2 28 C 20 25, 35 30, 48 18 C 65 6, 80 14, 108 4" fill="none" stroke="#2ecc71" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="108" cy="4" r="3" fill="#2ecc71"/>
+        </svg>
+      </div>
+
+      <div class="card-stats-strip">
+        <div class="stat-col">
+          <span class="stat-col-lab">账户规模</span>
+          <span class="stat-col-val">+$2.17M</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">最大回撤</span>
+          <span class="stat-col-val" style="color:var(--green-accent)">1.0%</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">胜率</span>
+          <span class="stat-col-val pos">66.7%</span>
+        </div>
+      </div>
+
+      <div class="card-feature-hint">
+        主要盈利资产 <a href="token.html" style="color:var(--green-accent);text-decoration:none;font-weight:700" title="点击查看 SOPH/ETH 币种深度画像">SOPH / ETH ↗</a> · 中位持仓 8d 16h 1m
+      </div>
+
+      <div class="card-bottom-actions">
+        <button class="btn-quick-copy" onclick="triggerCopy('0x7163...163b')">跟单配置</button>
+        <a href="code.html" class="btn-view-detail">
+          查看详情
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- 卡片 3 (高频做市交易员 0x9a12...7e41) -->
+    <article class="wallet-card">
+      <div class="card-top">
+        <div class="card-identity">
+          <div class="card-avatar" style="color:#e5be79;background:#241f15;border-color:rgba(229,190,121,0.3)">9A</div>
+          <div class="card-id-text">
+            <span class="card-address">0x9a12...7e41</span>
+            <span class="card-badge-profile">算法做市 · 日内</span>
+          </div>
+        </div>
+        <div class="card-top-pnl">
+          <div class="card-pnl-num pos">+$214,580</div>
+          <div class="card-pnl-label">30天变化</div>
+        </div>
+      </div>
+
+      <div class="card-tags-row">
+        <span class="tag-risk tag-risk-safe">稳健</span>
+        <span class="tag-leverage">均杠杆 2.4x</span>
+      </div>
+
+      <div class="card-roi-block">
+        <div class="roi-left">
+          <span class="roi-big pos">+18.9%</span>
+          <span class="roi-sub">30D 收益率</span>
+        </div>
+        <svg class="sparkline-svg" viewBox="0 0 110 34">
+          <path d="M2 26 L 25 24 L 45 18 L 65 16 L 85 12 L 108 8" fill="none" stroke="#2ecc71" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="108" cy="8" r="3" fill="#2ecc71"/>
+        </svg>
+      </div>
+
+      <div class="card-stats-strip">
+        <div class="stat-col">
+          <span class="stat-col-lab">账户规模</span>
+          <span class="stat-col-val">+$5.80M</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">最大回撤</span>
+          <span class="stat-col-val" style="color:var(--green-accent)">3.2%</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">胜率</span>
+          <span class="stat-col-val pos">81.5%</span>
+        </div>
+      </div>
+
+      <div class="card-feature-hint">
+        主要盈利资产 BTC 网格 · 中位持仓 4h 22m
+      </div>
+
+      <div class="card-bottom-actions">
+        <button class="btn-quick-copy" onclick="triggerCopy('0x9a12...7e41')">跟单配置</button>
+        <a href="code.html" class="btn-view-detail">
+          查看详情
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- 卡片 4 (山寨爆发捕捉型 0x3d88...cc02) -->
+    <article class="wallet-card">
+      <div class="card-top">
+        <div class="card-identity">
+          <div class="card-avatar" style="color:#a78bfa;background:#20192e;border-color:rgba(167,139,250,0.3)">3D</div>
+          <div class="card-id-text">
+            <span class="card-address">0x3d88...cc02</span>
+            <span class="card-badge-profile">山寨动量 · 波段</span>
+          </div>
+        </div>
+        <div class="card-top-pnl">
+          <div class="card-pnl-num pos">+$592,100</div>
+          <div class="card-pnl-label">30天变化</div>
+        </div>
+      </div>
+
+      <div class="card-tags-row">
+        <span class="tag-risk tag-risk-agg">激进</span>
+        <span class="tag-leverage">均杠杆 5.0x</span>
+      </div>
+
+      <div class="card-roi-block">
+        <div class="roi-left">
+          <span class="roi-big pos">+142.6%</span>
+          <span class="roi-sub">30D 收益率</span>
+        </div>
+        <svg class="sparkline-svg" viewBox="0 0 110 34">
+          <path d="M2 32 C 30 30, 50 28, 65 14 C 80 2, 95 10, 108 3" fill="none" stroke="#2ecc71" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="108" cy="3" r="3" fill="#2ecc71"/>
+        </svg>
+      </div>
+
+      <div class="card-stats-strip">
+        <div class="stat-col">
+          <span class="stat-col-lab">账户规模</span>
+          <span class="stat-col-val">+$890K</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">最大回撤</span>
+          <span class="stat-col-val" style="color:var(--orange)">19.4%</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">胜率</span>
+          <span class="stat-col-val pos">58.3%</span>
+        </div>
+      </div>
+
+      <div class="card-feature-hint">
+        主要盈利资产 SUI / TIA · 中位持仓 3d 12h
+      </div>
+
+      <div class="card-bottom-actions">
+        <button class="btn-quick-copy" onclick="triggerCopy('0x3d88...cc02')">跟单配置</button>
+        <a href="code.html" class="btn-view-detail">
+          查看详情
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- 卡片 5 (宏观趋势大仓位 0x11ee...90bc) -->
+    <article class="wallet-card">
+      <div class="card-top">
+        <div class="card-identity">
+          <div class="card-avatar" style="color:#38bdf8;background:#13212c;border-color:rgba(56,189,248,0.3)">11</div>
+          <div class="card-id-text">
+            <span class="card-address">0x11ee...90bc</span>
+            <span class="card-badge-profile">宏观大宗 · 长线</span>
+          </div>
+        </div>
+        <div class="card-top-pnl">
+          <div class="card-pnl-num pos">+$1,450,200</div>
+          <div class="card-pnl-label">30天变化</div>
+        </div>
+      </div>
+
+      <div class="card-tags-row">
+        <span class="tag-risk tag-risk-safe">稳健</span>
+        <span class="tag-leverage">均杠杆 1.8x</span>
+      </div>
+
+      <div class="card-roi-block">
+        <div class="roi-left">
+          <span class="roi-big pos">+24.1%</span>
+          <span class="roi-sub">30D 收益率</span>
+        </div>
+        <svg class="sparkline-svg" viewBox="0 0 110 34">
+          <path d="M2 28 C 30 26, 60 18, 80 15 L 108 7" fill="none" stroke="#2ecc71" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="108" cy="7" r="3" fill="#2ecc71"/>
+        </svg>
+      </div>
+
+      <div class="card-stats-strip">
+        <div class="stat-col">
+          <span class="stat-col-lab">账户规模</span>
+          <span class="stat-col-val">+$45.2M</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">最大回撤</span>
+          <span class="stat-col-val" style="color:var(--green-accent)">4.1%</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">胜率</span>
+          <span class="stat-col-val pos">84.0%</span>
+        </div>
+      </div>
+
+      <div class="card-feature-hint">
+        主要盈利资产 PAXG / BTC · 中位持仓 45d 08h
+      </div>
+
+      <div class="card-bottom-actions">
+        <button class="btn-quick-copy" onclick="triggerCopy('0x11ee...90bc')">跟单配置</button>
+        <a href="code.html" class="btn-view-detail">
+          查看详情
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- 卡片 6 (统计套利策略 0x67ab...88df) -->
+    <article class="wallet-card">
+      <div class="card-top">
+        <div class="card-identity">
+          <div class="card-avatar" style="color:#ec4899;background:#26151f;border-color:rgba(236,72,153,0.3)">67</div>
+          <div class="card-id-text">
+            <span class="card-address">0x67ab...88df</span>
+            <span class="card-badge-profile">期现费率 · 算法</span>
+          </div>
+        </div>
+        <div class="card-top-pnl">
+          <div class="card-pnl-num pos">+$182,340</div>
+          <div class="card-pnl-label">30天变化</div>
+        </div>
+      </div>
+
+      <div class="card-tags-row">
+        <span class="tag-risk tag-risk-safe">稳健</span>
+        <span class="tag-leverage">均杠杆 3.0x</span>
+      </div>
+
+      <div class="card-roi-block">
+        <div class="roi-left">
+          <span class="roi-big pos">+11.8%</span>
+          <span class="roi-sub">30D 收益率</span>
+        </div>
+        <svg class="sparkline-svg" viewBox="0 0 110 34">
+          <path d="M2 24 L 20 23 L 40 20 L 60 17 L 80 14 L 108 10" fill="none" stroke="#2ecc71" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="108" cy="10" r="3" fill="#2ecc71"/>
+        </svg>
+      </div>
+
+      <div class="card-stats-strip">
+        <div class="stat-col">
+          <span class="stat-col-lab">账户规模</span>
+          <span class="stat-col-val">+$8.40M</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">最大回撤</span>
+          <span class="stat-col-val" style="color:var(--green-accent)">0.8%</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-col-lab">胜率</span>
+          <span class="stat-col-val pos">92.1%</span>
+        </div>
+      </div>
+
+      <div class="card-feature-hint">
+        主要盈利资金费套利 · 中位持仓 21d 00h
+      </div>
+
+      <div class="card-bottom-actions">
+        <button class="btn-quick-copy" onclick="triggerCopy('0x67ab...88df')">跟单配置</button>
+        <a href="code.html" class="btn-view-detail">
+          查看详情
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+      </div>
+    </article>
+
+  </section>
+</div>
+
+<!-- 跟单配置弹窗 -->
+<div class="modal-backdrop" id="copy-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green-accent)" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        配置跟单策略
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="关闭">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="target-trader">
+        <div class="target-info">
+          <span class="target-label">跟单目标交易员</span>
+          <span class="target-addr" id="modal-target-addr">0x456f...01ac</span>
+        </div>
+        <div class="target-stat">
+          <div class="target-stat-val">+72.4%</div>
+          <div class="target-stat-lab">历史胜率</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label-row">
+          <span class="form-label">跟单本金</span>
+          <span class="form-extra">可用余额: 12,450.00 USDC</span>
+        </div>
+        <div class="input-wrap">
+          <input type="number" class="form-input" id="copy-amount" value="1000" min="50" step="50">
+          <span class="input-unit">USDC</span>
+        </div>
+        <div class="quick-chips">
+          <span class="chip" data-amt="500">500</span>
+          <span class="chip active" data-amt="1000">1,000</span>
+          <span class="chip" data-amt="3000">3,000</span>
+          <span class="chip" data-amt="5000">5,000</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label-row">
+          <span class="form-label">跟单仓位杠杆倍率</span>
+          <span class="form-extra" id="ratio-display" style="color:var(--green-accent)">1.0x (原比例)</span>
+        </div>
+        <div class="slider-row">
+          <input type="range" class="range-slider" id="ratio-slider" min="0.2" max="3.0" step="0.1" value="1.0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label-row">
+          <span class="form-label">账户强制止损保护</span>
+          <span class="form-extra" style="color:var(--red)">亏损达限自动全平</span>
+        </div>
+        <div class="input-wrap">
+          <input type="number" class="form-input" id="stop-loss" value="20" min="5" max="60">
+          <span class="input-unit">% 回撤</span>
+        </div>
+      </div>
+
+      <div class="check-row checked" id="sync-check">
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="check-text">
+          <span class="check-title">立即同步建立现有持仓头寸</span>
+          <span class="check-sub">按最新标记价格与当前比例同步建立相同开仓方向</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" id="btn-cancel">取消</button>
+      <button class="btn-confirm" id="btn-confirm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        确定跟单
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 提示框 Toast -->
+<div class="toast-msg" id="toast"></div>
+
+<script>
+// 顶部下拉
+const noticeBtn = document.getElementById('notice-btn');
+const noticeDropdown = document.getElementById('notice-dropdown');
+const walletBtn = document.getElementById('wallet-btn');
+const walletDropdown = document.getElementById('wallet-dropdown');
+
+noticeBtn.onclick = (e) => {
+  e.stopPropagation();
+  walletDropdown.classList.remove('open');
+  noticeDropdown.classList.toggle('open');
+};
+walletBtn.onclick = (e) => {
+  e.stopPropagation();
+  noticeDropdown.classList.remove('open');
+  walletDropdown.classList.toggle('open');
+};
+document.addEventListener('click', () => {
+  noticeDropdown.classList.remove('open');
+  walletDropdown.classList.remove('open');
+});
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+function switchLang(lang) {
+  document.querySelectorAll('.lang-pill').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  showToast(lang === 'zh' ? '已切换系统语言：简体中文' : 'Switched language to English');
+}
+
+function showInviteModal() {
+  walletDropdown.classList.remove('open');
+  showToast('邀请码【SMART-8888】已复制，享受 20% 返佣');
+}
+
+// 1. 搜索建档逻辑
+const searchInput = document.getElementById('search-input');
+const btnAnalyze = document.getElementById('btn-analyze');
+
+// 高级筛选折叠/展开
+const btnToggleFilters = document.getElementById('btn-toggle-filters');
+const filterCard = document.getElementById('filter-card');
+if (btnToggleFilters && filterCard) {
+  btnToggleFilters.onclick = () => {
+    const isClosed = filterCard.classList.toggle('collapsed');
+    btnToggleFilters.classList.toggle('open', !isClosed);
+    showToast(isClosed ? '已收起高级筛选' : '已展开多维量化筛选');
+  };
+}
+
+btnAnalyze.onclick = () => {
+  const val = searchInput.value.trim();
+  if (!val) {
+    showToast('请输入钱包地址或交易画像关键词');
+    searchInput.focus();
+    return;
+  }
+  showToast(`正在对 ${val} 进行全网交易画像深度建档...`);
+  setTimeout(() => {
+    window.location.href = 'code.html';
+  }, 900);
+};
+
+searchInput.onkeydown = (e) => {
+  if (e.key === 'Enter') btnAnalyze.click();
+};
+
+// 2. 交易风格一级 Tab 切换
+const styleTabs = document.querySelectorAll('.style-tab-btn');
+const countEl = document.getElementById('result-count');
+
+styleTabs.forEach(tab => {
+  tab.onclick = function() {
+    styleTabs.forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    const badgeVal = this.querySelector('.style-tab-badge').textContent;
+    countEl.textContent = badgeVal;
+    showToast(`已切换至【${this.childNodes[0].textContent.trim()}】交易风格`);
+  };
+});
+
+// 3. 高级筛选区交互
+document.querySelectorAll('.filter-options').forEach(group => {
+  group.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.onclick = function() {
+      group.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      recalcFilter();
+    };
+  });
+});
+
+function recalcFilter() {
+  const count = Math.floor(Math.random() * 200) + 120;
+  countEl.textContent = count.toLocaleString();
+}
+
+// 4. 重置按钮
+document.getElementById('btn-reset').onclick = () => {
+  document.querySelectorAll('.style-tab-btn').forEach((t, i) => {
+    t.classList.toggle('active', i === 0);
+  });
+  document.querySelectorAll('.filter-options').forEach(group => {
+    group.querySelectorAll('.filter-chip').forEach((c, idx) => {
+      c.classList.toggle('active', idx === 1 || (group.dataset.dim === 'asset' && idx === 2));
+    });
+  });
+  countEl.textContent = '1,000';
+  showToast('筛选条件已恢复默认');
+};
+
+// 排序与升降序
+let isAsc = false;
+const btnOrder = document.getElementById('btn-order');
+btnOrder.onclick = () => {
+  isAsc = !isAsc;
+  btnOrder.innerHTML = isAsc 
+    ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 14 12 9 7 14"></polyline></svg>'
+    : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="7 10 12 15 17 10"></polyline></svg>';
+  showToast(isAsc ? '已切换为：升序排列' : '已切换为：降序排列');
+};
+
+document.getElementById('sort-select').onchange = function() {
+  showToast(`已按【${this.options[this.selectedIndex].text}】重排`);
+};
+
+// 视图切换
+const btnCard = document.getElementById('btn-view-card');
+const btnList = document.getElementById('btn-view-list');
+const container = document.getElementById('wallets-container');
+
+btnCard.onclick = () => {
+  btnCard.classList.add('active');
+  btnList.classList.remove('active');
+  container.style.gridTemplateColumns = 'repeat(3, 1fr)';
+  showToast('切换为：卡片视图');
+};
+
+btnList.onclick = () => {
+  btnList.classList.add('active');
+  btnCard.classList.remove('active');
+  container.style.gridTemplateColumns = '1fr';
+  showToast('切换为：列表视图');
+};
+
+// 跟单弹窗逻辑
+const copyModal = document.getElementById('copy-modal');
+const modalClose = document.getElementById('modal-close');
+const btnCancel = document.getElementById('btn-cancel');
+const btnConfirm = document.getElementById('btn-confirm');
+const modalTargetAddr = document.getElementById('modal-target-addr');
+
+const closeModal = () => copyModal.classList.remove('open');
+modalClose.onclick = closeModal;
+btnCancel.onclick = closeModal;
+copyModal.onclick = (e) => { if (e.target === copyModal) closeModal(); };
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && copyModal.classList.contains('open')) closeModal();
+});
+
+const copyAmtInput = document.getElementById('copy-amount');
+document.querySelectorAll('.quick-chips .chip').forEach(chip => {
+  chip.onclick = function() {
+    document.querySelectorAll('.quick-chips .chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    copyAmtInput.value = this.dataset.amt;
+  };
+});
+
+const ratioSlider = document.getElementById('ratio-slider');
+const ratioDisplay = document.getElementById('ratio-display');
+ratioSlider.oninput = function() {
+  const val = parseFloat(this.value);
+  let text = `${val.toFixed(1)}x`;
+  if (val === 1.0) text += ' (原比例)';
+  else if (val < 1.0) text += ' (保守跟单)';
+  else text += ' (激进放大)';
+  ratioDisplay.textContent = text;
+};
+
+const syncCheck = document.getElementById('sync-check');
+syncCheck.onclick = function() { this.classList.toggle('checked'); };
+
+function triggerCopy(addr) {
+  modalTargetAddr.textContent = addr;
+  copyModal.classList.add('open');
+}
+
+btnConfirm.onclick = () => {
+  btnConfirm.innerHTML = '正在签名提交合约...';
+  btnConfirm.style.opacity = '0.7';
+
+  setTimeout(() => {
+    btnConfirm.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> 确定跟单`;
+    btnConfirm.style.opacity = '';
+    closeModal();
+    showToast(`跟单已成功启动！正在前往「我的跟单」进行实时监控...`);
+    setTimeout(() => {
+      window.location.href = 'copytrade.html';
+    }, 900);
+  }, 700);
+};
+</script>
+</body>
+</html>
